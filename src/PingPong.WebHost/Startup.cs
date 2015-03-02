@@ -1,11 +1,12 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LightInject;
 using Owin;
-using PingPong.Shared;
+﻿using Ping.Configuration;
+﻿using PingPong.Shared;
 
 namespace PingPong.WebHost
 {
@@ -14,7 +15,7 @@ namespace PingPong.WebHost
         public void Configuration(IAppBuilder app)
         {
             var container = CreateInjectorContainer();
-            
+
             app.Map("/ping", map => container.GetInstance<IModuleEngine>("ping").RegisterApi(map));
             app.Map("/pong", map => container.GetInstance<IModuleEngine>("pong").RegisterApi(map));
         }
@@ -23,8 +24,10 @@ namespace PingPong.WebHost
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
+            container.RegisterInstance(new PingOptions(){RunMode = RunMode.Sync});
             container.Register<IModuleEngine, Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
+            
 
             return container;
         }

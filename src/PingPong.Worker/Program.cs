@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
+using Ping.Configuration;
 using PingPong.Shared;
 using Pong;
 
@@ -24,6 +25,7 @@ namespace PingPong.Worker
             container.RegisterInstance(Configure());
             container.Register<IModuleEngine,Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
+            container.RegisterInstance(new PingOptions(){RunMode = RunMode.Sync});
             
             return container;
         }
