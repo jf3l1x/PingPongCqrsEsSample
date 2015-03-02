@@ -48,9 +48,11 @@
     <Compile Include="IGiveTenantConfiguration.cs" />
     <Compile Include="IModuleConfiguration.cs" />
     <Compile Include="IModuleEngine.cs" />
+    <Compile Include="IServiceBus.cs" />
     <Compile Include="MemoryConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TenantConfigurator.cs" />
+    <Compile Include="VoidBus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

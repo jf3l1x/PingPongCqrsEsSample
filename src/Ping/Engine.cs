@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Web.Http;
+using CommonDomain;
+using CommonDomain.Persistence;
+using CommonDomain.Persistence.EventStore;
 using LightInject;
+using NEventStore;
+using NEventStore.Persistence.Sql.SqlDialects;
 using Owin;
 using Ping.Configuration;
 using Ping.Handlers;
 using Ping.Handlers.Commands;
+using Ping.Services.Default;
 using PingPong.Shared;
 
 namespace Ping
@@ -47,12 +53,20 @@ namespace Ping
         private ServiceContainer CreateContainer()
         {
             var container = new ServiceContainer();
+            
             container.Register<CmdHandler>();
             if (_options.RunMode == RunMode.Sync)
             {
                 container.Register<ICreateHandle, SynchronousHandlerFactory>();
             }
-            
+            container.Register<IServiceBus,VoidBus>();
+            container.Register<IRepository,EventStoreRepository>();
+            container.Register<IConstructAggregates,AggregateFactory>();
+            container.Register<IDetectConflicts, NullConflictDetection>();
+            container.RegisterInstance(Wireup.Init()
+                .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
+                .UsingJsonSerialization().Build());
             return container;
         }
     }

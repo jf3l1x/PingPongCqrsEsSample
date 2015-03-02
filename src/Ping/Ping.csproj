@@ -89,6 +89,9 @@
     <Compile Include="Messages\ExternalEvents\PongSent.cs" />
     <Compile Include="Model\PingAggregate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Default\AggregateFactory.cs" />
+    <Compile Include="Services\Default\NullConflictDetection.cs" />
+    <Compile Include="Services\Default\TenantConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PingPong.Shared\PingPong.Shared.csproj">

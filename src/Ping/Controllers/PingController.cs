@@ -20,12 +20,14 @@ namespace Ping.Controllers
         {
             return Task.FromResult("ping");
         }
-        public Task<Guid> Post(int countLimit, TimeSpan timeLimit)
+        [Route("Start")]
+        [HttpPost]
+        public Task<Guid> Post(int countLimit, int timeLimit)
         {
             var cmd = new StartPing()
             {
                 CountLimit = countLimit,
-                TimeLimit = timeLimit,
+                TimeLimit = TimeSpan.FromSeconds(timeLimit),
                 AggregateId = Guid.NewGuid()
             };
             _handleFactory.Create<StartPing>().Handle(cmd);
