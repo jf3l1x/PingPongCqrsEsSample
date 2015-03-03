@@ -35,7 +35,7 @@ namespace PingPong.Worker
             var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
             
             
-            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes");
+            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes"){ReceiveMessages = true};
         }
     }
 }

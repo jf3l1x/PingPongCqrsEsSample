@@ -12,6 +12,8 @@ namespace PingPong.Shared
 
         public IGiveTenantConfiguration TenantConfigurator { get; private set; }
         public string BusConnectionString { get; private set; }
+        public bool ReceiveMessages { get; set; }
+
         public override string ToString()
         {
             var sb = new StringBuilder();

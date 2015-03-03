@@ -14,10 +14,10 @@ namespace Ping.Controllers
     
     public class PingController : ApiController
     {
-        private readonly ICreateCmdHandle _cmdHandleFactory;
+        private readonly ICreateHandlers _cmdHandleFactory;
         private readonly IReadModelRepository<PingSummary> _repository;
 
-        public PingController(ICreateCmdHandle cmdHandleFactory,IReadModelRepository<PingSummary> repository)
+        public PingController(ICreateHandlers cmdHandleFactory,IReadModelRepository<PingSummary> repository)
         {
             _cmdHandleFactory = cmdHandleFactory;
             _repository = repository;

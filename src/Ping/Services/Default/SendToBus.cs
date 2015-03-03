@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using NEventStore;
 using PingPong.Shared;
 
@@ -7,20 +6,16 @@ namespace Ping.Services.Default
 {
     internal class SendToBus : IPipelineHook
     {
-        private readonly IServiceBus _serviceBus;
-        
-        
+        private readonly Lazy<IServiceBus> _serviceBus;
 
-        public SendToBus(IServiceBus serviceBus)
+
+        public SendToBus(Func<IServiceBus> serviceBusFactory)
         {
-            _serviceBus = serviceBus;
-            
-            
+            _serviceBus = new Lazy<IServiceBus>(serviceBusFactory);
         }
 
         public void Dispose()
         {
-            
         }
 
         public ICommit Select(ICommit committed)
@@ -35,20 +30,18 @@ namespace Ping.Services.Default
 
         public void PostCommit(ICommit committed)
         {
-            foreach (var evt in committed.Events)
+            foreach (EventMessage evt in committed.Events)
             {
-                _serviceBus.Send(evt.Body);
+                _serviceBus.Value.Send(evt.Body);
             }
         }
 
         public void OnPurge(string bucketId)
         {
-            
         }
 
         public void OnDeleteStream(string bucketId, string streamId)
         {
-            
         }
     }
 }

@@ -8,12 +8,12 @@ namespace Ping.Services.Default
 {
     public class SynchronousBus : IServiceBus
     {
-        private readonly ICreateEvtHandle _handlerFactory;
+        private readonly ICreateHandlers _handlerFactory;
         private static readonly Dictionary<Type, MethodInfo> Creates = new Dictionary<Type, MethodInfo>();
         private static readonly Dictionary<Type, MethodInfo> Handles = new Dictionary<Type, MethodInfo>();
         private readonly MethodInfo _createMethod;
         
-        public SynchronousBus(ICreateEvtHandle handlerFactory)
+        public SynchronousBus(ICreateHandlers handlerFactory)
         {
             _handlerFactory = handlerFactory;
             _createMethod = _handlerFactory.GetType().GetMethod("Create");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Owin.Hosting;
 
 namespace PingPong.WebHost
@@ -7,11 +8,16 @@ namespace PingPong.WebHost
     {
         private static void Main(string[] args)
         {
-            const string url = "http://localhost:9999";
-            using (WebApp.Start<Startup>(url))
+            var options = new StartOptions("http://*:9999")
+            {
+                ServerFactory = "Microsoft.Owin.Host.HttpListener"
+            };
+            
+            
+            using (WebApp.Start<Startup>(options))
             {
                 Console.WriteLine("\n\nAll Applications...");
-                Console.WriteLine("\n\nServer listening at {0}. Press enter to stop", url);
+                Console.WriteLine("\n\nServer listening . Press enter to stop");
                 Console.ReadLine();
             }
         }

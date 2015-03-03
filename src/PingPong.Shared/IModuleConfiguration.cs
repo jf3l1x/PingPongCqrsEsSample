@@ -4,5 +4,6 @@
     {
         IGiveTenantConfiguration TenantConfigurator { get; }
         string BusConnectionString { get; }
+        bool ReceiveMessages { get; set; }
     }
 }

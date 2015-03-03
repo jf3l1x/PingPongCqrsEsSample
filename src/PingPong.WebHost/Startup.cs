@@ -24,7 +24,7 @@ namespace PingPong.WebHost
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
-            container.RegisterInstance(new PingOptions(){RunMode = RunMode.Sync});
+            container.RegisterInstance(new PingOptions(){RunMode = RunMode.Async});
             container.Register<IModuleEngine, Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
             

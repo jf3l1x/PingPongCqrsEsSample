@@ -1,6 +1,6 @@
 ﻿namespace Ping.Handlers
 {
-    public interface ICreateCmdHandle
+    public interface ICreateHandlers
     {
         IHandle<T> Create<T>();
     }
