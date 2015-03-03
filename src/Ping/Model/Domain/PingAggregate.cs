@@ -4,7 +4,7 @@ using CommonDomain.Core;
 using Ping.Messages.Commands;
 using Ping.Messages.Events;
 
-namespace Ping.Model
+namespace Ping.Model.Domain
 {
     public class PingAggregate : AggregateBase
     {

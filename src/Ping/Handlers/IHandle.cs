@@ -2,8 +2,9 @@
 
 namespace Ping.Handlers
 {
+    
     public interface IHandle<T>
     {
-        void Handle(T cmd);
+        void Handle(T msg);
     }
 }

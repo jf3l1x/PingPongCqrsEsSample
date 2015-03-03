@@ -4,6 +4,7 @@ using CommonDomain.Persistence;
 using Ping.Messages.Commands;
 using Ping.Messages.ExternalEvents;
 using Ping.Model;
+using Ping.Model.Domain;
 using PingPong.Shared;
 
 namespace Ping.Handlers.Commands

@@ -18,7 +18,7 @@ namespace Ping.Services.Default
 
         public IDbConnection Open()
         {
-            var connection = new SqlConnection(_tenantConfigurator.GetConnectionString("default"));
+            var connection = new SqlConnection(_tenantConfigurator.GetConnectionString());
             connection.Open();
             return connection;
         }

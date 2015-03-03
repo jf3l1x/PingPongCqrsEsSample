@@ -5,32 +5,27 @@ namespace PingPong.Shared
 {
     public class TenantConfigurator : IGiveTenantConfiguration
     {
-        private readonly Dictionary<string, string> _tenants;
+        private readonly string _connectionString;
 
-        public TenantConfigurator()
+
+        public TenantConfigurator(string connectionString)
         {
-            _tenants = new Dictionary<string, string>();
+            _connectionString = connectionString;
         }
 
-        public string GetConnectionString(string tenantId)
+        public string GetConnectionString()
         {
-            return _tenants[tenantId];
+            return _connectionString;
         }
 
-        public void RegisterTenant(string id, string connectionString)
-        {
-            _tenants.Add(id, connectionString);
-        }
+      
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            foreach (var tenant in _tenants)
-            {
-                sb.AppendFormat("{0}:{1}", tenant.Key, tenant.Value);
-                sb.AppendLine();
-            }
-            return sb.ToString();
+            
+           
+                return string.Format("{0}:{1}", "default", _connectionString);
+            
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using CommonDomain;
 using CommonDomain.Persistence;
@@ -8,8 +9,11 @@ using NEventStore;
 using NEventStore.Persistence.Sql.SqlDialects;
 using Owin;
 using Ping.Configuration;
+using Ping.EntityFramework;
 using Ping.Handlers;
 using Ping.Handlers.Commands;
+using Ping.Handlers.Events;
+using Ping.Model.Read;
 using Ping.Services.Default;
 using PingPong.Shared;
 
@@ -55,18 +59,34 @@ namespace Ping
             var container = new ServiceContainer();
             
             container.Register<CmdHandler>();
+            container.Register<EvtHandler>();
+            container.RegisterInstance(_configuration.TenantConfigurator);
+            container.Register<IRepository, EventStoreRepository>();
+            container.Register<IConstructAggregates, AggregateFactory>();
+            container.Register<IDetectConflicts, NullConflictDetection>();
+            container.Register<IReadModelRepository<PingSummary>,PingSummaryContext>();
             if (_options.RunMode == RunMode.Sync)
             {
-                container.Register<ICreateHandle, SynchronousHandlerFactory>();
+                container.Register<ICreateCmdHandle, SynchronousCmdHandlerFactory>();
+                container.Register<ICreateEvtHandle, SynchronousEvtHandlerFactory>();
+                container.Register<IServiceBus, SynchronousBus>();
+                container.Register<IPipelineHook, SendToBus>();
+                container.RegisterInstance(Wireup.Init()
+                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                    .WithDialect(new MsSqlDialect()).InitializeStorageEngine().UsingJsonSerialization()
+                    .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>())
+                    .Build());
             }
-            container.Register<IServiceBus,VoidBus>();
-            container.Register<IRepository,EventStoreRepository>();
-            container.Register<IConstructAggregates,AggregateFactory>();
-            container.Register<IDetectConflicts, NullConflictDetection>();
-            container.RegisterInstance(Wireup.Init()
-                .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
-                .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
-                .UsingJsonSerialization().Build());
+            else
+            {
+                container.RegisterInstance(Wireup.Init()
+                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                    .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
+                    .UsingJsonSerialization().Build());
+                container.Register<IServiceBus, SynchronousBus>();
+            }
+            
+          
             return container;
         }
     }

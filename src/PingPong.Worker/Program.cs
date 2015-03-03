@@ -32,8 +32,8 @@ namespace PingPong.Worker
 
         private static IModuleConfiguration Configure()
         {
-            var tenantConfigurator = new TenantConfigurator();
-            tenantConfigurator.RegisterTenant("default", "Server=.;Database=pingpong;Trusted_Connection=True;");
+            var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
+            
             
             return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes");
         }

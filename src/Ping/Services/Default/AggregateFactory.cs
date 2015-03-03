@@ -3,6 +3,7 @@ using CommonDomain;
 using CommonDomain.Core;
 using CommonDomain.Persistence;
 using Ping.Model;
+using Ping.Model.Domain;
 
 namespace Ping.Services.Default
 {
