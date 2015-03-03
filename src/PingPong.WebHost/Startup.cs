@@ -1,9 +1,4 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LightInject;
+﻿using LightInject;
 using Owin;
 ﻿using Ping.Configuration;
 ﻿using PingPong.Shared;
@@ -37,7 +32,7 @@ namespace PingPong.WebHost
             var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
             
 
-            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes");
+            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@10.1.2.83:5672/testes");
         }
     }
 }

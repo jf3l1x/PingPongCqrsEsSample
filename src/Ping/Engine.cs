@@ -88,7 +88,9 @@ namespace Ping
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
+            
             container.Register<IPipelineHook, SendToBus>();
+
             if (_options.RunMode == RunMode.Sync)
             {
                 container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();

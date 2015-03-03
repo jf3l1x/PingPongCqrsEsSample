@@ -1,4 +1,5 @@
 ﻿using Ping.Handlers.Commands;
+using PingPong.Shared;
 
 namespace Ping.Handlers.Sync
 {

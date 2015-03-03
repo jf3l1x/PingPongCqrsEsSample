@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ping.Messages.ExternalEvents
+namespace Pong.Messages.ExternalEvents
 {
     public class PongSent : BaseMessage
     {

@@ -11,7 +11,7 @@ using PingPong.Shared;
 namespace Ping.Handlers.Commands
 {
     public class DefaultHandler : IHandle<StartPing>, IHandle<StopPing>, IHandle<ReceivePingResponse>,
-        IHandle<PingResponseReceived>, IHandle<PingStarted>, IHandle<PingStopped>
+        IHandle<PingResponseReceived>, IHandle<PingStarted>, IHandle<PingStopped>,IHandle<PongSent>
     {
         private readonly Lazy<IServiceBus> _bus;
         private readonly Lazy<IReadModelRepository<PingSummary>> _readModelRepository;
@@ -111,6 +111,15 @@ namespace Ping.Handlers.Commands
             ping.Stop(cmd);
 
             _writeModelRepository.Value.Save(ping, Guid.NewGuid());
+        }
+
+        public void Handle(PongSent msg)
+        {
+            _bus.Value.Send(new ReceivePingResponse()
+            {
+                AggregateId = msg.PingId,
+                ResponseTime = msg.SendTime
+            });
         }
     }
 }

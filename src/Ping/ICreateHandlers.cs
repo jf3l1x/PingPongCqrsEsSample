@@ -1,4 +1,4 @@
-﻿namespace Ping.Handlers
+﻿namespace Ping
 {
     public interface ICreateHandlers
     {

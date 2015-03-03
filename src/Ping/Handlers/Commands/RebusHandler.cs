@@ -34,7 +34,7 @@ namespace Ping.Handlers.Commands
 
         public void Handle(PongSent message)
         {
-           throw new NotImplementedException();
+            _innerHandler.Handle(message);
         }
 
         public void Handle(ReceivePingResponse message)

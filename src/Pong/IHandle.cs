@@ -1,6 +1,4 @@
-﻿using Ping.Messages.Commands;
-
-namespace Ping.Handlers
+﻿namespace Pong
 {
     
     public interface IHandle<T>

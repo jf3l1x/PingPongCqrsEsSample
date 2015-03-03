@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 using Ping.Configuration;
 using PingPong.Shared;
-using Pong;
 
 namespace PingPong.Worker
 {
@@ -35,7 +33,7 @@ namespace PingPong.Worker
             var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
             
             
-            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes"){ReceiveMessages = true};
+            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@10.1.2.83:5672/testes"){ReceiveMessages = true};
         }
     }
 }

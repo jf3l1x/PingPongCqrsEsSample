@@ -95,9 +95,9 @@
     <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
     <Compile Include="Handlers\Commands\DefaultHandler.cs" />
     <Compile Include="Handlers\Commands\RebusHandler.cs" />
-    <Compile Include="Handlers\ICreateHandlers.cs" />
-    <Compile Include="Handlers\IHandle.cs" />
     <Compile Include="Handlers\Sync\SynchronousCmdHandlerFactory.cs" />
+    <Compile Include="ICreateHandlers.cs" />
+    <Compile Include="IHandle.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\Commands\ReceivePingResponse.cs" />
     <Compile Include="Messages\Commands\StartPing.cs" />
