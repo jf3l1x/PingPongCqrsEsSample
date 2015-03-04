@@ -1,8 +1,7 @@
-﻿namespace Ping.Configuration
+﻿namespace Pong.Configuration
 {
-    public class PingOptions
+    public class PongOptions
     {
-        public RunMode RunMode { get; set; }
         public PersistenceMode WriteModelPersistenceMode { get; set; }
         public PersistenceMode ReadModelPersistenceMode { get; set; }
     }

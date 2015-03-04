@@ -2,6 +2,7 @@
 using Owin;
 ﻿using Ping.Configuration;
 ﻿using PingPong.Shared;
+using Pong.Configuration;
 
 namespace PingPong.WebHost
 {
@@ -20,6 +21,7 @@ namespace PingPong.WebHost
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
             container.RegisterInstance(new PingOptions(){RunMode = RunMode.Async});
+            container.RegisterInstance(new PongOptions());
             container.Register<IModuleEngine, Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
             

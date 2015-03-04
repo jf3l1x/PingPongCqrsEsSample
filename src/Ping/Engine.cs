@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -10,19 +11,26 @@ using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
 using NEventStore.Persistence.Sql.SqlDialects;
+using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Dialect;
+using NHibernate.Driver;
+using NHibernate.Mapping.ByCode;
 using Owin;
 using Ping.Configuration;
-using Ping.EntityFramework;
 using Ping.Handlers;
 using Ping.Handlers.Async;
 using Ping.Handlers.Commands;
 using Ping.Handlers.Sync;
 using Ping.Model.Read;
+using Ping.Persistence.EntityFramework;
+using Ping.Persistence.NHibernate.Mappings;
 using Ping.Services.Default;
 using PingPong.Shared;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.RabbitMQ;
+using NHibernateConfiguration = NHibernate.Cfg.Configuration;
 
 namespace Ping
 {
@@ -72,7 +80,9 @@ namespace Ping
             container.Register<IRepository, EventStoreRepository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
-            container.Register<IReadModelRepository<PingSummary>, PingSummaryContext>();
+
+            ConfigureReadPersistenceModel(container);
+            
             container.Register<IDetermineMessageOwnership, MessageRouter>();
             container.Register<IContainerAdapter, MyContainerAdapter>();
             container.Register<IResolveTypes, DefaultTypeResolver>();
@@ -121,6 +131,63 @@ namespace Ping
 
 
             return container;
+        }
+
+        private void ConfigureReadPersistenceModel(ServiceContainer container)
+        {
+            switch (_options.ReadModelPersistenceMode)
+            {
+                case PersistenceMode.NHibernate:
+                    container.Register<ISessionFactory>(factory => CreateNHibernateSessionFactory(factory),
+                        new PerContainerLifetime());
+                    container.Register<IStatelessSession>(
+                        factory =>
+                            factory.GetInstance<ISessionFactory>().OpenStatelessSession(factory.GetInstance<IDbConnection>()),
+                        new PerRequestLifeTime());
+                    container.Register<IReadModelRepository<PingSummary>, Persistence.NHibernate.PingSummaryRepository>();
+                    break;
+
+                default:
+                    // Default is Entity Framework.
+                    container.Register<IReadModelRepository<PingSummary>, PingSummaryRepository>();
+                    break;
+            }
+        }
+
+        private ISessionFactory CreateNHibernateSessionFactory(IServiceFactory factory)
+        {
+            var mapper = new ModelMapper();
+            var configuration = new NHibernateConfiguration();
+
+            mapper.AddMapping<PingSummaryMap>();
+
+            configuration.DataBaseIntegration(x =>
+            {
+                x.ConnectionString = _configuration.TenantConfigurator.GetConnectionString();
+                x.IsolationLevel = IsolationLevel.ReadUncommitted;
+                x.Driver<Sql2008ClientDriver>();
+                x.Dialect<MsSql2012Dialect>();
+                x.BatchSize = 50;
+                x.Timeout = 30;
+
+#if DEBUG
+                x.LogSqlInConsole = true;
+                x.LogFormattedSql = true;
+                x.AutoCommentSql = true;
+                
+#endif
+            });
+
+            
+#if DEBUG
+            configuration.SessionFactory().GenerateStatistics();
+#endif
+
+              configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+
+            ISessionFactory sessionFactory = configuration.BuildSessionFactory();
+
+            return sessionFactory;
         }
     }
     internal class DefaultTypeResolver : IResolveTypes

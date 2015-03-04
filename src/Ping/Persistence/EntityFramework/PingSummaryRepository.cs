@@ -3,13 +3,14 @@ using System.Linq;
 using Ping.Model.Read;
 using PingPong.Shared;
 
-namespace Ping.EntityFramework
+namespace Ping.Persistence.EntityFramework
 {
     
-    internal class PingSummaryContext : DbContext, IReadModelRepository<PingSummary>
+    internal class PingSummaryRepository : DbContext, IReadModelRepository<PingSummary>
     {
 
-        public PingSummaryContext(IGiveTenantConfiguration tenantConfiguration):base(tenantConfiguration.GetConnectionString())
+        public PingSummaryRepository(IGiveTenantConfiguration tenantConfiguration)
+            : base(tenantConfiguration.GetConnectionString())
         {
             
         }

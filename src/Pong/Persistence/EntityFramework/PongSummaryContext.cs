@@ -3,7 +3,7 @@ using System.Linq;
 using PingPong.Shared;
 using Pong.Model.Read;
 
-namespace Pong.EntityFramework
+namespace Pong.Persistence.EntityFramework
 {
     
     internal class PongSummaryContext : DbContext, IReadModelRepository<PongSummary>
