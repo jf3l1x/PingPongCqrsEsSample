@@ -25,7 +25,7 @@ namespace PingPong.Worker
             container.RegisterInstance(Configure());
             container.Register<IModuleEngine,Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
-            container.RegisterInstance(new PingOptions{RunMode = RunMode.Sync,ReadModelPersistenceMode = PersistenceMode.PetaPoco});
+            container.RegisterInstance(new PingOptions { RunMode = RunMode.Sync, ReadModelPersistenceMode = PersistenceMode.EntityFramework });
             container.RegisterInstance(new PongOptions());
             
             return container;
