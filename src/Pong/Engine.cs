@@ -2,11 +2,16 @@
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
+using NEventStore.Persistence.EventStore;
+using NEventStore.Persistence.EventStore.Services;
+using NEventStore.Persistence.EventStore.Services.Naming;
+using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using NHibernate;
 using NHibernate.Cfg;
@@ -26,6 +31,7 @@ using Pong.Services.Default;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.RabbitMQ;
+using DefaultNamingStrategy = NEventStore.Persistence.EventStore.Services.Naming.DefaultNamingStrategy;
 
 namespace Pong
 {
@@ -57,6 +63,7 @@ namespace Pong
             container.RegisterInstance(_configuration.TenantConfigurator);
 
             container.Register<DefaultHandler>();
+            container.Register<IConnectionFactory,TenantConnectionFactory>();
             container.Register<IRepository, EventStoreRepository>();
 
             ConfigureReadPersistenceModel(container);
@@ -81,8 +88,15 @@ namespace Pong
             container.Register<IServiceBus, AsynchronousBus>();
             container.Register<ICreateHandlers, AsynchronousHandler>();
             container.RegisterInstance(Wireup.Init()
-                .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
-                .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
+                .UsingEventStorePersistence(
+                    new EventStorePersistenceOptions()
+                    {
+                        TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
+                        HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
+                        UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
+                        MinimunSnapshotThreshold = 50
+                    }, new JsonNetSerializer(),
+                    new DefaultNamingStrategy())
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
         }
@@ -100,8 +114,7 @@ namespace Pong
                         new PerRequestLifeTime());
                     container.Register<IReadModelRepository<PongSummary>, Persistence.NHibernate.PongSummaryRepository>();
                     break;
-                    break;
-
+                    
 
                 default:
                         container.Register<IReadModelRepository<PongSummary>, PongSummaryContext>();

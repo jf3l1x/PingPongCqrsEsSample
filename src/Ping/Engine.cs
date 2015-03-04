@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Web.Http;
@@ -10,6 +12,10 @@ using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
+using NEventStore.Persistence.EventStore;
+using NEventStore.Persistence.EventStore.Services;
+using NEventStore.Persistence.EventStore.Services.Naming;
+using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using NHibernate;
 using NHibernate.Cfg;
@@ -23,6 +29,7 @@ using Ping.Handlers.Async;
 using Ping.Handlers.Commands;
 using Ping.Handlers.Sync;
 using Ping.Model.Read;
+using Ping.Persistence.Dapper;
 using Ping.Persistence.EntityFramework;
 using Ping.Persistence.NHibernate.Mappings;
 using Ping.Services.Default;
@@ -30,6 +37,7 @@ using PingPong.Shared;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.RabbitMQ;
+using DefaultNamingStrategy = NEventStore.Persistence.EventStore.Services.Naming.DefaultNamingStrategy;
 using NHibernateConfiguration = NHibernate.Cfg.Configuration;
 
 namespace Ping
@@ -87,6 +95,8 @@ namespace Ping
             container.Register<IContainerAdapter, MyContainerAdapter>();
             container.Register<IResolveTypes, DefaultTypeResolver>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
+            
+            container.Register<IConnectionFactory,TenantConnectionFactory>();
             container.Register<RebusHandler>();
 
             if (_configuration.ReceiveMessages)
@@ -113,8 +123,16 @@ namespace Ping
                 container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();
                 container.Register<IServiceBus, SynchronousBus>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
-                    .WithDialect(new MsSqlDialect()).InitializeStorageEngine().UsingJsonSerialization()
+                    .UsingEventStorePersistence(
+                        new EventStorePersistenceOptions()
+                        {
+                            TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
+                            HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
+                            UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
+                            MinimunSnapshotThreshold = 50
+                        }, new JsonNetSerializer(),
+                        new DefaultNamingStrategy())
+                    .UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>())
                     .Build());
             }
@@ -123,8 +141,15 @@ namespace Ping
                 container.Register<IServiceBus, AsynchronousBus>();
                 container.Register<ICreateHandlers, AsynchronousHandler>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
-                    .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
+                    .UsingEventStorePersistence(
+                        new EventStorePersistenceOptions()
+                        {
+                            TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
+                            HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
+                            UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
+                            MinimunSnapshotThreshold = 50
+                        }, new JsonNetSerializer(),
+                        new DefaultNamingStrategy())
                     .UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
             }
