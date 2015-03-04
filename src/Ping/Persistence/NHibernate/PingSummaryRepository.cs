@@ -44,11 +44,13 @@ namespace Ping.Persistence.NHibernate
 
         public IQueryable<PingSummary> Query()
         {
-            using (var session = _sessionFactory())
-            {
-                return session.Query<PingSummary>().ToList().AsQueryable();
-            }
-            
+            //using (var session = _sessionFactory())
+            //{
+            //    return session.Query<PingSummary>().ToList().AsQueryable();
+            //}
+
+            // TODO Need close session using open session in view strategy because OData need to change queryable returned by this repository before complete http response.
+            return _sessionFactory().Query<PingSummary>();
         }
 
         public void Update(PingSummary obj)
@@ -60,10 +62,7 @@ namespace Ping.Persistence.NHibernate
                     session.Update(obj);
                     transaction.Commit();
                 }
-
             }
-         
-            
         }
 
         public void Delete(PingSummary obj)

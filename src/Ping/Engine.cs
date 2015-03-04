@@ -7,6 +7,8 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Web.Http;
+using System.Web.OData.Builder;
+using System.Web.OData.Extensions;
 using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
@@ -56,12 +58,13 @@ namespace Ping
 
         public IAppBuilder RegisterApi(IAppBuilder app)
         {
-            HttpConfiguration configuration = Configure();
+            HttpConfiguration configuration = CreateHttpConfiguration();
             ServiceContainer container = CreateContainer();
             container.RegisterApiControllers();
             container.EnableWebApi(configuration);
-
             app.UseWebApi(configuration);
+
+
             return app;
         }
 
@@ -71,10 +74,16 @@ namespace Ping
             
         }
 
-        private HttpConfiguration Configure()
+        private HttpConfiguration CreateHttpConfiguration()
         {
             var configuration = new HttpConfiguration();
             configuration.MapHttpAttributeRoutes();
+            
+            // OData
+            ODataModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<PingSummary>("PingSummaries");
+
+            configuration.MapODataServiceRoute("odata", "odata", builder.GetEdmModel());
 
             return configuration;
         }
