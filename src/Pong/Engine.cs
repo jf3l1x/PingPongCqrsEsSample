@@ -6,6 +6,7 @@ using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
+using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using Owin;
 using PingPong.Shared;
@@ -47,8 +48,9 @@ namespace Pong
             container.RegisterInstance(_configuration.TenantConfigurator);
 
             container.Register<DefaultHandler>();
+            container.Register<IConnectionFactory,TenantConnectionFactory>();
             container.Register<IRepository, EventStoreRepository>();
-            container.Register<IReadModelRepository<PongSummary>, PongSummaryContext>();
+            container.Register<IReadModelRepository<PongSummary>, Dapper.Repository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
@@ -69,7 +71,7 @@ namespace Pong
             container.Register<IServiceBus, AsynchronousBus>();
             container.Register<ICreateHandlers, AsynchronousHandler>();
             container.RegisterInstance(Wireup.Init()
-                .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                 .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());

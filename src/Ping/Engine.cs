@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +11,7 @@ using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
+using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using Owin;
 using Ping.Configuration;
@@ -72,11 +75,13 @@ namespace Ping
             container.Register<IRepository, EventStoreRepository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
-            container.Register<IReadModelRepository<PingSummary>, PingSummaryContext>();
+            container.Register<IReadModelRepository<PingSummary>, Dapper.Repository>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
             container.Register<IContainerAdapter, MyContainerAdapter>();
             container.Register<IResolveTypes, DefaultTypeResolver>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
+            
+            container.Register<IConnectionFactory,TenantConnectionFactory>();
             container.Register<RebusHandler>();
 
             if (_configuration.ReceiveMessages)
@@ -103,7 +108,7 @@ namespace Ping
                 container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();
                 container.Register<IServiceBus, SynchronousBus>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                    .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                     .WithDialect(new MsSqlDialect()).InitializeStorageEngine().UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>())
                     .Build());
@@ -113,7 +118,7 @@ namespace Ping
                 container.Register<IServiceBus, AsynchronousBus>();
                 container.Register<ICreateHandlers, AsynchronousHandler>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingSqlPersistence(new TenantConnectionFactory(_configuration.TenantConfigurator))
+                    .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                     .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
                     .UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
