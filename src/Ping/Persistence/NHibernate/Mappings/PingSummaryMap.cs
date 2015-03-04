@@ -15,7 +15,7 @@ namespace Ping.Persistence.NHibernate.Mappings
             Id(x => x.Id, m => m.Generator(Generators.Assigned));
             
             Property(x => x.Start);
-            Property(x => x.End);
+            Property(x => x.End, mapper => mapper.Column("[End]"));
             Property(x => x.PingsPerSecond);
             Property(x => x.TotalResponses);
             Property(x => x.Active);

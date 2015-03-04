@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NHibernate;
 using NHibernate.Linq;
 using Ping.Model.Read;
@@ -8,37 +9,78 @@ namespace Ping.Persistence.NHibernate
 {
     public class PingSummaryRepository : IReadModelRepository<PingSummary>
     {
-        private readonly IStatelessSession _session;
+        private readonly Func<IStatelessSession> _sessionFactory;
+        
 
-        public PingSummaryRepository(IStatelessSession session)
+        public PingSummaryRepository(Func<IStatelessSession> sessionFactory)
         {
-            _session = session;
+            _sessionFactory = sessionFactory;
+            
         }
 
         public void Create(PingSummary obj)
         {
-            _session.Update(obj);
+            using (var session = _sessionFactory())
+            {
+                using (var transaction=session.BeginTransaction())
+                {
+                    session.Insert(obj);    
+                    transaction.Commit();
+                }
+                
+            }
+            
         }
 
         public PingSummary Retrieve(object id)
         {
-            return _session.Get<PingSummary>(id);
+
+            using (var session = _sessionFactory())
+            {
+                return session.Get<PingSummary>(id);
+            }
+            
         }
 
         public IQueryable<PingSummary> Query()
         {
-            return _session.Query<PingSummary>();
+            using (var session = _sessionFactory())
+            {
+                return session.Query<PingSummary>().ToList().AsQueryable();
+            }
+            
         }
 
         public void Update(PingSummary obj)
         {
-            _session.Update(obj);
+            using (var session = _sessionFactory())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    session.Update(obj);
+                    transaction.Commit();
+                }
+
+            }
+         
+            
         }
 
         public void Delete(PingSummary obj)
         {
-            var toDelete = _session.Get<PingSummary>(obj.Id);
-            _session.Delete(toDelete);
+            using (var session = _sessionFactory())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    var toDelete = session.Get<PingSummary>(obj.Id);
+                    session.Delete(toDelete);
+                    transaction.Commit();
+                }
+
+            }
+            
+            
+            
         }
     }
 }

@@ -4,6 +4,7 @@ using LightInject;
 using Ping.Configuration;
 using PingPong.Shared;
 using Pong.Configuration;
+using PersistenceMode = Ping.Configuration.PersistenceMode;
 
 namespace PingPong.Worker
 {
@@ -24,7 +25,7 @@ namespace PingPong.Worker
             container.RegisterInstance(Configure());
             container.Register<IModuleEngine,Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
-            container.RegisterInstance(new PingOptions{RunMode = RunMode.Sync});
+            container.RegisterInstance(new PingOptions{RunMode = RunMode.Sync,ReadModelPersistenceMode = PersistenceMode.PetaPoco});
             container.RegisterInstance(new PongOptions());
             
             return container;

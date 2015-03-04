@@ -24,6 +24,7 @@ using NHibernate.Driver;
 using NHibernate.Mapping.ByCode;
 using Owin;
 using Ping.Configuration;
+using Ping.Extensions;
 using Ping.Handlers;
 using Ping.Handlers.Async;
 using Ping.Handlers.Commands;
@@ -123,15 +124,7 @@ namespace Ping
                 container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();
                 container.Register<IServiceBus, SynchronousBus>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingEventStorePersistence(
-                        new EventStorePersistenceOptions()
-                        {
-                            TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
-                            HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
-                            UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
-                            MinimunSnapshotThreshold = 50
-                        }, new JsonNetSerializer(),
-                        new DefaultNamingStrategy())
+                    .ConfigurePersistence(_options, container)
                     .UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>())
                     .Build());
@@ -141,15 +134,7 @@ namespace Ping
                 container.Register<IServiceBus, AsynchronousBus>();
                 container.Register<ICreateHandlers, AsynchronousHandler>();
                 container.RegisterInstance(Wireup.Init()
-                    .UsingEventStorePersistence(
-                        new EventStorePersistenceOptions()
-                        {
-                            TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
-                            HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
-                            UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
-                            MinimunSnapshotThreshold = 50
-                        }, new JsonNetSerializer(),
-                        new DefaultNamingStrategy())
+                    .ConfigurePersistence(_options,container)
                     .UsingJsonSerialization()
                     .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
             }
@@ -167,18 +152,22 @@ namespace Ping
                         new PerContainerLifetime());
                     container.Register<IStatelessSession>(
                         factory =>
-                            factory.GetInstance<ISessionFactory>().OpenStatelessSession(factory.GetInstance<IDbConnection>()),
-                        new PerRequestLifeTime());
+                            factory.GetInstance<ISessionFactory>().OpenStatelessSession());
                     container.Register<IReadModelRepository<PingSummary>, Persistence.NHibernate.PingSummaryRepository>();
                     break;
-
+                case PersistenceMode.Dapper:
+                    container.Register<IReadModelRepository<PingSummary>, Persistence.Dapper.Repository>();
+                    break;
+                case PersistenceMode.PetaPoco:
+                    container.Register<IReadModelRepository<PingSummary>, Persistence.PetaPoco.Repository>();
+                    break;
                 default:
                     // Default is Entity Framework.
                     container.Register<IReadModelRepository<PingSummary>, PingSummaryRepository>();
                     break;
             }
         }
-
+        
         private ISessionFactory CreateNHibernateSessionFactory(IServiceFactory factory)
         {
             var mapper = new ModelMapper();
