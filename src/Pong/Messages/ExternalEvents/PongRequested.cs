@@ -2,9 +2,9 @@
 
 namespace Pong.Messages.ExternalEvents
 {
-    public class PongRequested
+    public class PongRequested:BaseMessage
     {
-        public Guid PingId { get; set; }
+
         public DateTimeOffset RequestTime { get; set; }
     }
 }

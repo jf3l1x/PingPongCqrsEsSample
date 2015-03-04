@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Web.Http;
 using CommonDomain;
 using CommonDomain.Persistence;
@@ -82,7 +83,7 @@ namespace Ping
             {
                 container.RegisterInstance(
                     Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors").UseExchange("Rebus"))
+                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors").ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(type=>"ESB"))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
@@ -90,7 +91,7 @@ namespace Ping
             {
                 container.RegisterInstance(
                     Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString).UseExchange("Rebus"))
+                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString).ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(type => "ESB"))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }

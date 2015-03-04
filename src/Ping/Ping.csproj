@@ -90,7 +90,6 @@
     <Compile Include="Configuration\RunMode.cs" />
     <Compile Include="Controllers\PingController.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="EntityFramework\Configuration.cs" />
     <Compile Include="EntityFramework\PingSummaryContext.cs" />
     <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
     <Compile Include="Handlers\Commands\DefaultHandler.cs" />

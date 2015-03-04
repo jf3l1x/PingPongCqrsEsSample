@@ -1,11 +1,11 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 
-namespace Pong.EntityFramework
+namespace PingPong.Shared.EntityFramework
 {
-    public class Configuration : DbConfiguration
+    public class Config : DbConfiguration
     {
-        public Configuration()
+        public Config()
         {
             SetProviderServices(
                 "System.Data.SqlClient",

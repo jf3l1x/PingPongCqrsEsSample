@@ -5,12 +5,13 @@ using PingPong.Shared;
 
 namespace Ping.EntityFramework
 {
+    
     internal class PingSummaryContext : DbContext, IReadModelRepository<PingSummary>
     {
 
         public PingSummaryContext(IGiveTenantConfiguration tenantConfiguration):base(tenantConfiguration.GetConnectionString())
         {
-            Database.SetInitializer(new CreateDatabaseIfNotExists<PingSummaryContext>());
+            
         }
 
         public DbSet<PingSummary> Pings { get; set; }

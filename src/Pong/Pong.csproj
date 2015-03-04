@@ -69,7 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
-    <Compile Include="EntityFramework\Configuration.cs" />
     <Compile Include="EntityFramework\PongSummaryContext.cs" />
     <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
     <Compile Include="Handlers\Commands\DefaultHandler.cs" />

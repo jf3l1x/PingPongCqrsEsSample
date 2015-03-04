@@ -22,7 +22,8 @@ namespace Pong.Model.Domain
             RaiseEvent(new PongGenerated
             {
                 AggregateId = Id,
-                PingId = cmd.PingId
+                PingId = cmd.PingId,
+                RequestTime = cmd.RequestTime
             });
         }
 

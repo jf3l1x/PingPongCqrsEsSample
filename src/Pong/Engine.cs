@@ -59,8 +59,8 @@ namespace Pong
 
             container.RegisterInstance(
                 Configure.With(container.GetInstance<IContainerAdapter>())
-                
-                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors")).Events(r=>r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
+
+                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors").ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(type => "ESB")).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
                     .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                     .CreateBus().Start());
 

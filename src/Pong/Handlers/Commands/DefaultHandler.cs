@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CommonDomain.Core;
 using CommonDomain.Persistence;
 using PingPong.Shared;
@@ -27,18 +28,20 @@ namespace Pong.Handlers.Commands
 
         public void Handle(GeneratePong cmd)
         {
-            PongAggregate pong = _writeModelRepository.Value.GetById<PongAggregate>(cmd.AggregateId) ??
-                                 new PongAggregate(new RegistrationEventRouter(), cmd.AggregateId);
+            PongAggregate pong;
+            var pongReadModel=_readModelRepository.Value.Query().FirstOrDefault(p => p.PingId == cmd.PingId);
+            if (pongReadModel!=null)
+            {
+                pong=_writeModelRepository.Value.GetById<PongAggregate>(pongReadModel.Id);
+            }
+            else
+            {
+                pong = new PongAggregate(new RegistrationEventRouter(), cmd.AggregateId);    
+            }
+            
             pong.Generate(cmd);
 
             _writeModelRepository.Value.Save(pong, Guid.NewGuid());
-
-            _bus.Value.Send(new PongGenerated
-            {
-                AggregateId = cmd.AggregateId,
-                PingId = cmd.PingId,
-                RequestTime = cmd.RequestTime
-            });
 
             _bus.Value.Publish(new PongSent
             {
@@ -64,9 +67,7 @@ namespace Pong.Handlers.Commands
             }
             else
             {
-                summary.Count = summary.Count++;
-                summary.RequestTime = evt.RequestTime;
-
+                summary.Count++;
                 _readModelRepository.Value.Update(summary);
             }
         }
@@ -75,7 +76,7 @@ namespace Pong.Handlers.Commands
         {
             _bus.Value.Send(new GeneratePong
             {
-                PingId = msg.PingId,
+                PingId = msg.AggregateId,
                 RequestTime = msg.RequestTime
             });
         }

@@ -5,6 +5,7 @@ using Pong.Model.Read;
 
 namespace Pong.EntityFramework
 {
+    
     internal class PongSummaryContext : DbContext, IReadModelRepository<PongSummary>
     {
 
