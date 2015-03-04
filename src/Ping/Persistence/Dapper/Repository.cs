@@ -1,13 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
+﻿using System.Linq;
 using Dapper;
 using NEventStore.Persistence.Sql;
 using Ping.Model.Read;
 using PingPong.Shared;
 
-namespace Ping.Dapper
+namespace Ping.Persistence.Dapper
 {
     internal class Repository : IReadModelRepository<PingSummary>
     {

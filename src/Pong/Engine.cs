@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using NEventStore;
+using NEventStore.Persistence.EventStore;
+using NEventStore.Persistence.EventStore.Services;
+using NEventStore.Persistence.EventStore.Services.Naming;
 using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using Owin;
 using PingPong.Shared;
-using Pong.EntityFramework;
 using Pong.Handlers.Async;
 using Pong.Handlers.Commands;
 using Pong.Messages.Commands;
 using Pong.Model.Read;
+using Pong.Persistence.EntityFramework;
 using Pong.Services.Default;
 using Rebus;
 using Rebus.Configuration;
@@ -50,7 +54,7 @@ namespace Pong
             container.Register<DefaultHandler>();
             container.Register<IConnectionFactory,TenantConnectionFactory>();
             container.Register<IRepository, EventStoreRepository>();
-            container.Register<IReadModelRepository<PongSummary>, Dapper.Repository>();
+            container.Register<IReadModelRepository<PongSummary>, Persistence.PetaPoco.Repository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
@@ -71,8 +75,15 @@ namespace Pong
             container.Register<IServiceBus, AsynchronousBus>();
             container.Register<ICreateHandlers, AsynchronousHandler>();
             container.RegisterInstance(Wireup.Init()
-                .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
-                .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
+                .UsingEventStorePersistence(
+                    new EventStorePersistenceOptions()
+                    {
+                        TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
+                        HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
+                        UserCredentials = new EventStore.ClientAPI.SystemData.UserCredentials("admin", "changeit"),
+                        MinimunSnapshotThreshold = 50
+                    }, new JsonNetSerializer(),
+                    new DefaultNamingStrategy())
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
         }

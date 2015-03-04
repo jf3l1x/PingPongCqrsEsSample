@@ -3,7 +3,7 @@ using System.Linq;
 using Ping.Model.Read;
 using PingPong.Shared;
 
-namespace Ping.EntityFramework
+namespace Ping.Persistence.EntityFramework
 {
     
     internal class PingSummaryContext : DbContext, IReadModelRepository<PingSummary>

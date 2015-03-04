@@ -5,7 +5,7 @@ using NEventStore.Persistence.Sql;
 using PingPong.Shared;
 using Pong.Model.Read;
 
-namespace Pong.Dapper
+namespace Pong.Persistence.Dapper
 {
     internal class Repository : IReadModelRepository<PongSummary>
     {

@@ -41,6 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="EventStore.ClientAPI">
+      <HintPath>..\packages\EventStore.Client.3.0.1\lib\net40\EventStore.ClientAPI.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
@@ -52,6 +55,10 @@
     </Reference>
     <Reference Include="NEventStore">
       <HintPath>..\packages\NEventStore.5.1.1\lib\net40\NEventStore.dll</HintPath>
+    </Reference>
+    <Reference Include="NEventStore.Persistence.EventStore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\references\NEventStore.Persistence.EventStore.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -95,9 +102,9 @@
     <Compile Include="Configuration\PingOptions.cs" />
     <Compile Include="Configuration\RunMode.cs" />
     <Compile Include="Controllers\PingController.cs" />
-    <Compile Include="Dapper\Repository.cs" />
+    <Compile Include="Persistence\Dapper\Repository.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="EntityFramework\PingSummaryContext.cs" />
+    <Compile Include="Persistence\EntityFramework\PingSummaryContext.cs" />
     <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
     <Compile Include="Handlers\Commands\DefaultHandler.cs" />
     <Compile Include="Handlers\Commands\RebusHandler.cs" />
@@ -115,6 +122,8 @@
     <Compile Include="Messages\ExternalEvents\PongSent.cs" />
     <Compile Include="Model\Domain\PingAggregate.cs" />
     <Compile Include="Model\Read\PingSummary.cs" />
+    <Compile Include="Persistence\PetaPoco\PetaPoco.cs" />
+    <Compile Include="Persistence\PetaPoco\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Default\AsynchronousBus.cs" />
     <Compile Include="Services\Default\MessageRouter.cs" />

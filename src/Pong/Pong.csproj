@@ -41,6 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="EventStore.ClientAPI">
+      <HintPath>..\packages\EventStore.Client.3.0.1\lib\net40\EventStore.ClientAPI.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
@@ -49,6 +52,9 @@
     </Reference>
     <Reference Include="NEventStore">
       <HintPath>..\packages\NEventStore.5.1.1\lib\net40\NEventStore.dll</HintPath>
+    </Reference>
+    <Reference Include="NEventStore.Persistence.EventStore">
+      <HintPath>..\..\references\NEventStore.Persistence.EventStore.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -74,9 +80,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dapper\Repository.cs" />
+    <Compile Include="Persistence\Dapper\Repository.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="EntityFramework\PongSummaryContext.cs" />
+    <Compile Include="Persistence\EntityFramework\PongSummaryContext.cs" />
     <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
     <Compile Include="Handlers\Commands\DefaultHandler.cs" />
     <Compile Include="Handlers\Commands\RebusHandler.cs" />
@@ -89,6 +95,8 @@
     <Compile Include="Messages\ExternalEvents\PongSent.cs" />
     <Compile Include="Model\Domain\PongAggregate.cs" />
     <Compile Include="Model\Read\PongSummary.cs" />
+    <Compile Include="Persistence\PetaPoco\PetaPoco.cs" />
+    <Compile Include="Persistence\PetaPoco\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Default\AsynchronousBus.cs" />
     <Compile Include="Services\Default\AggregateFactory.cs" />
