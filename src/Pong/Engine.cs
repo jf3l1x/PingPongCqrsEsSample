@@ -1,4 +1,7 @@
-﻿using CommonDomain;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
@@ -9,6 +12,7 @@ using PingPong.Shared;
 using Pong.EntityFramework;
 using Pong.Handlers.Async;
 using Pong.Handlers.Commands;
+using Pong.Messages.Commands;
 using Pong.Model.Read;
 using Pong.Services.Default;
 using Rebus;
@@ -49,11 +53,14 @@ namespace Pong
             container.Register<IDetectConflicts, NullConflictDetection>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
             container.Register<IContainerAdapter, MyContainerAdapter>();
+            container.Register <IResolveTypes,DefaultTypeResolver>();
+            container.Register<IMutateMessages, DefaultMessageMutator>();
             container.Register<RebusHandler>();
 
             container.RegisterInstance(
                 Configure.With(container.GetInstance<IContainerAdapter>())
-                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors"))
+                
+                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors")).Events(r=>r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
                     .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                     .CreateBus().Start());
 
@@ -66,6 +73,18 @@ namespace Pong
                 .WithDialect(new MsSqlDialect()).InitializeStorageEngine()
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
+        }
+    }
+
+    internal class DefaultTypeResolver:IResolveTypes
+    {
+        public Type ResolveType(string eventName)
+        {
+            return
+                typeof (Engine).Assembly.GetTypes()
+                    .FirstOrDefault(
+                        t =>
+                            String.Compare(t.Name, eventName, StringComparison.InvariantCultureIgnoreCase)==0);
         }
     }
 }

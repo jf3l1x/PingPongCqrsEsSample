@@ -1,4 +1,8 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Web.Http;
 using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
@@ -70,21 +74,23 @@ namespace Ping
             container.Register<IReadModelRepository<PingSummary>, PingSummaryContext>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
             container.Register<IContainerAdapter, MyContainerAdapter>();
+            container.Register<IResolveTypes, DefaultTypeResolver>();
+            container.Register<IMutateMessages, DefaultMessageMutator>();
             container.Register<RebusHandler>();
 
             if (_configuration.ReceiveMessages)
             {
                 container.RegisterInstance(
-                    Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>())
-                        .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors"))
+                    Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
+                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors").UseExchange("Rebus"))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
             else
             {
                 container.RegisterInstance(
-                    Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>())
-                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString))
+                    Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
+                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString).UseExchange("Rebus"))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
@@ -114,6 +120,17 @@ namespace Ping
 
 
             return container;
+        }
+    }
+    internal class DefaultTypeResolver : IResolveTypes
+    {
+        public Type ResolveType(string eventName)
+        {
+            return
+                typeof (Engine).Assembly.GetTypes()
+                    .FirstOrDefault(
+                        t =>
+                            String.Compare(t.Name, eventName, StringComparison.InvariantCultureIgnoreCase) == 0);
         }
     }
 }

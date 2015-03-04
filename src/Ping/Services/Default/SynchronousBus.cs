@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Ping.Handlers;
 using PingPong.Shared;
+using Rebus;
 
 namespace Ping.Services.Default
 {
@@ -12,13 +13,14 @@ namespace Ping.Services.Default
         private static readonly Dictionary<Type, MethodInfo> Creates = new Dictionary<Type, MethodInfo>();
         private static readonly Dictionary<Type, MethodInfo> Handles = new Dictionary<Type, MethodInfo>();
         private readonly MethodInfo _createMethod;
-        
-        public SynchronousBus(ICreateHandlers handlerFactory)
+        private Lazy<IBus> _innerBus;
+
+        public SynchronousBus(ICreateHandlers handlerFactory,Func<IBus> busFactory )
         {
             _handlerFactory = handlerFactory;
             _createMethod = _handlerFactory.GetType().GetMethod("Create");
-            
-            
+            _innerBus = new Lazy<IBus>(busFactory);
+
         }
         
         public void Send(object msg)
@@ -44,7 +46,7 @@ namespace Ping.Services.Default
 
         public void Publish(object msg)
         {
-            Console.WriteLine(msg.GetType().Name);
+            _innerBus.Value.Publish(msg);
         }
 
        
