@@ -1,6 +1,7 @@
 ﻿using System;
 using CommonDomain;
 using CommonDomain.Core;
+using PingPong.Shared;
 using Pong.Messages.Commands;
 using Pong.Messages.Events;
 
@@ -16,7 +17,14 @@ namespace Pong.Model.Domain
             Id = id;
             handler.Register<PongGenerated>(Handle);
         }
-
+        public PongAggregate(IRouteEvents handler, Guid id,int count,int version)
+            : base(handler)
+        {
+            Id = id;
+            Version = version;
+            _count = count;
+            handler.Register<PongGenerated>(Handle);
+        }
         public void Generate(GeneratePong cmd)
         {
             RaiseEvent(new PongGenerated
@@ -33,5 +41,14 @@ namespace Pong.Model.Domain
             _count++;
         }
 
+        protected override IMemento GetSnapshot()
+        {
+            return new SnapShot(new { Count=_count,PingId=_pingId})
+            {
+                Id = Id,
+                Version = Version
+            };
+        }
+        
     }
 }

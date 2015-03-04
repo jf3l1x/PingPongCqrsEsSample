@@ -86,7 +86,7 @@ namespace Ping
             container.Register<DefaultHandler>();
 
             container.RegisterInstance(_configuration.TenantConfigurator);
-            container.Register<IRepository, EventStoreRepository>();
+            container.Register<IRepository, EventStoreRepositoryWithSnapshot>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
 
@@ -123,22 +123,20 @@ namespace Ping
             {
                 container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();
                 container.Register<IServiceBus, SynchronousBus>();
-                container.RegisterInstance(Wireup.Init()
-                    .ConfigurePersistence(_options, container)
-                    .UsingJsonSerialization()
-                    .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>())
-                    .Build());
+               
             }
             else
             {
                 container.Register<IServiceBus, AsynchronousBus>();
                 container.Register<ICreateHandlers, AsynchronousHandler>();
-                container.RegisterInstance(Wireup.Init()
-                    .ConfigurePersistence(_options,container)
-                    .UsingJsonSerialization()
-                    .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
+               
             }
-
+            container.RegisterInstance(Wireup.Init()
+                   .ConfigurePersistence(_options, container)
+                   .UsingJsonSerialization()
+                   
+                   .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>())
+                   .Build());
 
             return container;
         }

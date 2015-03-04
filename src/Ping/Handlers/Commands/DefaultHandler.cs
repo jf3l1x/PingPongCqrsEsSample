@@ -13,14 +13,15 @@ namespace Ping.Handlers.Commands
     public class DefaultHandler : IHandle<StartPing>, IHandle<StopPing>, IHandle<ReceivePingResponse>,
         IHandle<PingResponseReceived>, IHandle<PingStarted>, IHandle<PingStopped>,IHandle<PongSent>
     {
+        private readonly Func<IRepository> _writeRepositoryFactory;
         private readonly Lazy<IServiceBus> _bus;
         private readonly Lazy<IReadModelRepository<PingSummary>> _readModelRepository;
-        private readonly Lazy<IRepository> _writeModelRepository;
+        
 
         public DefaultHandler(Func<IRepository> writeRepositoryFactory, Func<IServiceBus> busFactory,
             Func<IReadModelRepository<PingSummary>> readRepositoryFactory)
         {
-            _writeModelRepository = new Lazy<IRepository>(writeRepositoryFactory);
+            _writeRepositoryFactory = writeRepositoryFactory;
             _bus = new Lazy<IServiceBus>(busFactory);
             _readModelRepository = new Lazy<IReadModelRepository<PingSummary>>(readRepositoryFactory);
         }
@@ -75,13 +76,35 @@ namespace Ping.Handlers.Commands
 
         public void Handle(ReceivePingResponse cmd)
         {
-            PingAggregate ping = _writeModelRepository.Value.GetById<PingAggregate>(cmd.AggregateId) ??
-                                 new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
-            ping.ReceivePingResponse(cmd);
-
-            _writeModelRepository.Value.Save(ping, Guid.NewGuid());
-            if (ping.IsActive())
+            using (var repository = _writeRepositoryFactory())
             {
+                PingAggregate ping = repository.GetById<PingAggregate>(cmd.AggregateId) ??
+                                 new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
+                ping.ReceivePingResponse(cmd);
+
+                repository.Save(ping, Guid.NewGuid());
+                if (ping.IsActive())
+                {
+                    _bus.Value.Publish(new PongRequested
+                    {
+                        AggregateId = ping.Id,
+                        RequestTime = DateTimeOffset.UtcNow
+                    });
+                }
+            }
+            
+            
+        }
+
+        public void Handle(StartPing cmd)
+        {
+            using (var repository = _writeRepositoryFactory())
+            {
+                PingAggregate ping = repository.GetById<PingAggregate>(cmd.AggregateId) ??
+                                     new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
+                ping.Start(cmd);
+
+                repository.Save(ping, Guid.NewGuid());
                 _bus.Value.Publish(new PongRequested
                 {
                     AggregateId = ping.Id,
@@ -90,27 +113,16 @@ namespace Ping.Handlers.Commands
             }
         }
 
-        public void Handle(StartPing cmd)
-        {
-            PingAggregate ping = _writeModelRepository.Value.GetById<PingAggregate>(cmd.AggregateId) ??
-                                 new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
-            ping.Start(cmd);
-
-            _writeModelRepository.Value.Save(ping, Guid.NewGuid());
-            _bus.Value.Publish(new PongRequested
-            {
-                AggregateId = ping.Id,
-                RequestTime = DateTimeOffset.UtcNow
-            });
-        }
-
         public void Handle(StopPing cmd)
         {
-            PingAggregate ping = _writeModelRepository.Value.GetById<PingAggregate>(cmd.AggregateId) ??
-                                 new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
-            ping.Stop(cmd);
+            using (var repository = _writeRepositoryFactory())
+            {
+                PingAggregate ping = repository.GetById<PingAggregate>(cmd.AggregateId) ??
+                                     new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
+                ping.Stop(cmd);
 
-            _writeModelRepository.Value.Save(ping, Guid.NewGuid());
+                repository.Save(ping, Guid.NewGuid());
+            }
         }
 
         public void Handle(PongSent msg)

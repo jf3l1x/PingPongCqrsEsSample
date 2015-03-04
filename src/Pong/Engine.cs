@@ -59,7 +59,7 @@ namespace Pong
 
             container.Register<DefaultHandler>();
             container.Register<IConnectionFactory, TenantConnectionFactory>();
-            container.Register<IRepository, EventStoreRepository>();
+            container.Register<IRepository, EventStoreRepositoryWithSnapshot>();
 
             ConfigureReadPersistenceModel(container);
 
@@ -83,14 +83,15 @@ namespace Pong
                     .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                     .CreateBus().Start());
 
-            container.Register<IPipelineHook, SendToBus>();
+            container.Register<IPipelineHook, SendToBus>("notifier");
+            
 
             container.Register<IServiceBus, AsynchronousBus>();
             container.Register<ICreateHandlers, AsynchronousHandler>();
             container.RegisterInstance(Wireup.Init()
                 .ConfigurePersistence(_options, container)
                 .UsingJsonSerialization()
-                .HookIntoPipelineUsing(container.GetInstance<IPipelineHook>()).Build());
+                .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>()).Build());
         }
 
         private void ConfigureReadPersistenceModel(ServiceContainer container)

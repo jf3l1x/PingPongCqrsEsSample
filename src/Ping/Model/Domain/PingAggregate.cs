@@ -3,6 +3,7 @@ using CommonDomain;
 using CommonDomain.Core;
 using Ping.Messages.Commands;
 using Ping.Messages.Events;
+using PingPong.Shared;
 
 namespace Ping.Model.Domain
 {
@@ -18,6 +19,24 @@ namespace Ping.Model.Domain
         public PingAggregate(IRouteEvents handler,Guid id) : base(handler)
         {
             Id = id;
+            RegisterHandlers(handler);
+        }
+        public PingAggregate(IRouteEvents handler, Guid id,bool active,int count,int countLimit,DateTimeOffset startTime,TimeSpan timelimit,int totalCount,int version)
+            : base(handler)
+        {
+            Id = id;
+            _active = active;
+            _count = count;
+            _countLimit = countLimit;
+            _startTime = startTime;
+            _timeLimit = timelimit;
+            _totalCount = totalCount;
+            Version = version;
+            RegisterHandlers(handler);
+        }
+
+        private void RegisterHandlers(IRouteEvents handler)
+        {
             handler.Register<PingResponseReceived>(Handle);
             handler.Register<PingStopped>(Handle);
             handler.Register<PingStarted>(Handle);
@@ -96,6 +115,15 @@ namespace Ping.Model.Domain
         private void Handle(PingStopped obj)
         {
             _active = false;
+        }
+
+        protected override IMemento GetSnapshot()
+        {
+            return new SnapShot(new{Active=_active,Count=_count,CountLimit=_countLimit,TimeLimit=_timeLimit,StartTime=_startTime,TotalCount=_totalCount})
+            {
+                Id = Id,
+                Version = Version
+            };
         }
 
         #endregion

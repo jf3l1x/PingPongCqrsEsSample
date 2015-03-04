@@ -11,7 +11,6 @@
     <AssemblyName>PingPong.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-   
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +41,9 @@
     <Reference Include="Microsoft.Owin">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="NEventStore">
+      <HintPath>..\packages\NEventStore.5.1.1\lib\net40\NEventStore.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -64,9 +66,11 @@
     <Compile Include="BusMessage.cs" />
     <Compile Include="DefaultMessageMutator.cs" />
     <Compile Include="EntityFramework\Config.cs" />
+    <Compile Include="EventStoreRepositoryWithSnapshot.cs" />
     <Compile Include="IGiveTenantConfiguration.cs" />
     <Compile Include="IModuleConfiguration.cs" />
     <Compile Include="IModuleEngine.cs" />
+    <Compile Include="Snapshot.cs" />
     <Compile Include="IReadModelRepository.cs" />
     <Compile Include="IServiceBus.cs" />
     <Compile Include="MemoryConfiguration.cs" />
@@ -78,7 +82,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

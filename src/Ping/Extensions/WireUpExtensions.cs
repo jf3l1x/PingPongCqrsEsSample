@@ -32,8 +32,9 @@ namespace Ping.Extensions
                 default:
                     return target.UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                         .WithDialect(new MsSqlDialect());
-                    
+
             }
         }
+
     }
 }
