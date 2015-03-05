@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using EventStore.ClientAPI.SystemData;
 using LightInject;
 using NEventStore;
@@ -7,6 +8,7 @@ using NEventStore.Persistence.EventStore.Services;
 using NEventStore.Persistence.EventStore.Services.Naming;
 using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
+using NEventStore.Serialization;
 using Pong.Configuration;
 
 namespace Ping.Extensions
@@ -29,6 +31,9 @@ namespace Ping.Extensions
                         }, new JsonNetSerializer(),
                         new DefaultNamingStrategy());
 
+                case PersistenceMode.MongoDB:
+                    return target.UsingMongoPersistence(() => "mongodb://localhost/testes", new DocumentObjectSerializer());
+                    
                 default:
                     return target.UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                         .WithDialect(new MsSqlDialect());

@@ -21,8 +21,17 @@ namespace PingPong.WebHost
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
-            container.RegisterInstance(new PingOptions(){RunMode = RunMode.Async,ReadModelPersistenceMode = PersistenceMode.NHibernate});
-            container.RegisterInstance(new PongOptions());
+            container.RegisterInstance(new PingOptions
+            {
+                RunMode = RunMode.Async,
+                ReadModelPersistenceMode = PersistenceMode.NHibernate
+            });
+
+            container.RegisterInstance(new PongOptions
+            {
+                
+            });
+
             container.Register<IModuleEngine, Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
             

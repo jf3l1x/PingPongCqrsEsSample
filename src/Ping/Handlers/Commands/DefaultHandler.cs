@@ -100,8 +100,7 @@ namespace Ping.Handlers.Commands
         {
             using (var repository = _writeRepositoryFactory())
             {
-                PingAggregate ping = repository.GetById<PingAggregate>(cmd.AggregateId) ??
-                                     new PingAggregate(new RegistrationEventRouter(), cmd.AggregateId);
+                var ping = repository.GetById<PingAggregate>(cmd.AggregateId);
                 ping.Start(cmd);
 
                 repository.Save(ping, Guid.NewGuid());

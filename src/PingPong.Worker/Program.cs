@@ -4,7 +4,8 @@ using LightInject;
 using Ping.Configuration;
 using PingPong.Shared;
 using Pong.Configuration;
-using PersistenceMode = Ping.Configuration.PersistenceMode;
+using PingPersistenceMode = Ping.Configuration.PersistenceMode;
+using PongPersistenceMode = Pong.Configuration.PersistenceMode;
 
 namespace PingPong.Worker
 {
@@ -23,10 +24,21 @@ namespace PingPong.Worker
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
-            container.Register<IModuleEngine,Ping.Engine>("ping");
+            container.Register<IModuleEngine, Ping.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
-            container.RegisterInstance(new PingOptions { RunMode = RunMode.Sync, ReadModelPersistenceMode = PersistenceMode.EntityFramework });
-            container.RegisterInstance(new PongOptions());
+
+            container.RegisterInstance(new PingOptions
+            {
+                RunMode = RunMode.Sync,
+                ReadModelPersistenceMode = PingPersistenceMode.EntityFramework,
+                WriteModelPersistenceMode = PingPersistenceMode.MongoDB
+            });
+
+            container.RegisterInstance(new PongOptions
+            {
+                ReadModelPersistenceMode = PongPersistenceMode.EntityFramework,
+                WriteModelPersistenceMode = PongPersistenceMode.MongoDB
+            });
             
             return container;
         }
