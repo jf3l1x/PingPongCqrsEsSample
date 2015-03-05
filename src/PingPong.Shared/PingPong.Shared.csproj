@@ -76,6 +76,7 @@
     <Compile Include="IGiveTenantConfiguration.cs" />
     <Compile Include="IModuleConfiguration.cs" />
     <Compile Include="IModuleEngine.cs" />
+    <Compile Include="PersistenceModes.cs" />
     <Compile Include="LightInject\BeginScopeInterceptor.cs" />
     <Compile Include="Snapshot.cs" />
     <Compile Include="IReadModelRepository.cs" />

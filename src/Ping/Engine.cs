@@ -32,6 +32,7 @@ using Ping.Handlers;
 using Ping.Handlers.Async;
 using Ping.Handlers.Commands;
 using Ping.Handlers.Sync;
+using Ping.Messages.ExternalEvents;
 using Ping.Model.Read;
 using Ping.Persistence.Dapper;
 using Ping.Persistence.NHibernate;
@@ -73,8 +74,13 @@ namespace Ping
 
         public void StartListener()
         {
-            CreateContainer();
+            var container=CreateContainer();
+            container.GetInstance<IBus>().Subscribe<PongSent>();
             
+
+
+
+
         }
 
         private HttpConfiguration CreateHttpConfiguration()
@@ -119,7 +125,7 @@ namespace Ping
             {
                 container.RegisterInstance(
                     Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors").ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(type=>"ESB"))
+                    .Transport(t => t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors").ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(ResolveTypeName))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
@@ -127,7 +133,7 @@ namespace Ping
             {
                 container.RegisterInstance(
                     Rebus.Configuration.Configure.With(container.GetInstance<IContainerAdapter>()).Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString).ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(type => "ESB"))
+                        .Transport(t => t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString).ManageSubscriptions().UseExchange("Rebus").AddEventNameResolver(ResolveTypeName))
                         .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                         .CreateBus().Start());
             }
@@ -156,6 +162,15 @@ namespace Ping
             return container;
         }
 
+        private string ResolveTypeName(Type type)
+        {
+            if (type == typeof (PongRequested))
+                return "pongrequested";
+            if (type == typeof (PongSent))
+                return "pongsent";
+            return string.Empty;
+        }
+
         private void ConfigureInterceptors(ServiceContainer container)
         {
             // All Handle methods of RebusHandler class are Begin Scope.
@@ -166,17 +181,15 @@ namespace Ping
         {
             switch (_options.ReadModelPersistenceMode)
             {
-                case PersistenceMode.NHibernate:
+                case ReadPersistenceMode.NHibernate:
                     container.Register(factory => CreateNHibernateSessionFactory(factory), new PerContainerLifetime());
                     container.Register(factory => factory.GetInstance<ISessionFactory>().OpenStatelessSession(), new PerScopeLifetime());
                     container.Register<IReadModelRepository<PingSummary>, Persistence.NHibernate.PingSummaryRepository>();
                     break;
-
-                case PersistenceMode.Dapper:
+                case ReadPersistenceMode.Dapper:
                     container.Register<IReadModelRepository<PingSummary>, Persistence.Dapper.Repository>();
                     break;
-
-                case PersistenceMode.PetaPoco:
+                case ReadPersistenceMode.PetaPoco:
                     container.Register<IReadModelRepository<PingSummary>, Persistence.PetaPoco.Repository>();
                     break;
 

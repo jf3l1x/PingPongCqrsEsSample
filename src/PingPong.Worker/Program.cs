@@ -4,8 +4,7 @@ using LightInject;
 using Ping.Configuration;
 using PingPong.Shared;
 using Pong.Configuration;
-using PingPersistenceMode = Ping.Configuration.PersistenceMode;
-using PongPersistenceMode = Pong.Configuration.PersistenceMode;
+
 
 namespace PingPong.Worker
 {
@@ -30,14 +29,14 @@ namespace PingPong.Worker
             container.RegisterInstance(new PingOptions
             {
                 RunMode = RunMode.Sync,
-                ReadModelPersistenceMode = PingPersistenceMode.NHibernate,
-                WriteModelPersistenceMode = PingPersistenceMode.EntityFramework
+                ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
+                WriteModelPersistenceMode = WritePersistenceMode.SqlServer
             });
 
             container.RegisterInstance(new PongOptions
             {
-                ReadModelPersistenceMode = PongPersistenceMode.NHibernate,
-                WriteModelPersistenceMode = PongPersistenceMode.EntityFramework
+                ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
+                WriteModelPersistenceMode = WritePersistenceMode.SqlServer
             });
             
             return container;
