@@ -17,7 +17,7 @@ namespace Pong.Services.Default
 
         public IDbConnection Open()
         {
-            var connection = new SqlConnection(_tenantConfigurator.GetConnectionString());
+            var connection = new SqlConnection(_tenantConfigurator.GetReadModelConnectionString());
             connection.Open();
             return connection;
         }

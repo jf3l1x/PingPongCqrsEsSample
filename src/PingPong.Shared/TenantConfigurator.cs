@@ -1,31 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Text;
-
-namespace PingPong.Shared
+﻿namespace PingPong.Shared
 {
     public class TenantConfigurator : IGiveTenantConfiguration
     {
-        private readonly string _connectionString;
+        private readonly string _readModelConnectionString;
+        private readonly string _writeModelConnectionString;
 
-
-        public TenantConfigurator(string connectionString)
+        public TenantConfigurator(string readModelConnectionString, string writeModelConnectionString)
         {
-            _connectionString = connectionString;
+            _readModelConnectionString = readModelConnectionString;
+            _writeModelConnectionString = writeModelConnectionString;
         }
 
-        public string GetConnectionString()
+        public string GetReadModelConnectionString()
         {
-            return _connectionString;
+            return _readModelConnectionString;
         }
 
-      
+        public string GetWriteModelConnectionString()
+        {
+            return _writeModelConnectionString;
+        }
 
         public override string ToString()
         {
-            
-           
-                return string.Format("{0}:{1}", "default", _connectionString);
-            
+            return string.Format("ReadModel: {0} / WriteModel: {1}", _readModelConnectionString,
+                _writeModelConnectionString);
         }
     }
 }

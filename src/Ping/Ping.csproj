@@ -155,6 +155,7 @@
     <Compile Include="Messages\ExternalEvents\PongSent.cs" />
     <Compile Include="Model\Domain\PingAggregate.cs" />
     <Compile Include="Model\Read\PingSummary.cs" />
+    <Compile Include="Persistence\MongoDB\PingSummaryRepositoryMongoDB.cs" />
     <Compile Include="Persistence\PetaPoco\PetaPoco.cs" />
     <Compile Include="Persistence\PetaPoco\Repository.cs" />
     <Compile Include="Persistence\NHibernate\Mappings\PingSummaryMap.cs" />

@@ -32,7 +32,7 @@ namespace Ping.Extensions
                         new DefaultNamingStrategy());
 
                 case WritePersistenceMode.MongoDB:
-                    return target.UsingMongoPersistence(() => "mongodb://localhost/testes", new DocumentObjectSerializer());
+                    return target.UsingMongoPersistence(() => container.GetInstance<IGiveTenantConfiguration>().GetWriteModelConnectionString(), new DocumentObjectSerializer());
                     
                 default:
                     return target.UsingSqlPersistence(container.GetInstance<IConnectionFactory>())

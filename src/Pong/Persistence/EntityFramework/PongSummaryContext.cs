@@ -9,7 +9,7 @@ namespace Pong.Persistence.EntityFramework
     internal class PongSummaryContext : DbContext, IReadModelRepository<PongSummary>
     {
 
-        public PongSummaryContext(IGiveTenantConfiguration tenantConfiguration) : base(tenantConfiguration.GetConnectionString())
+        public PongSummaryContext(IGiveTenantConfiguration tenantConfiguration) : base(tenantConfiguration.GetReadModelConnectionString())
         {
             Database.SetInitializer(new CreateDatabaseIfNotExists<PongSummaryContext>());
         }

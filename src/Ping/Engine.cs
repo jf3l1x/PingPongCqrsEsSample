@@ -14,6 +14,7 @@ using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
 using LightInject.Interception;
+using MongoDB.Driver;
 using NEventStore;
 using NEventStore.Persistence.EventStore;
 using NEventStore.Persistence.EventStore.Services;
@@ -76,11 +77,6 @@ namespace Ping
         {
             var container=CreateContainer();
             container.GetInstance<IBus>().Subscribe<PongSent>();
-            
-
-
-
-
         }
 
         private HttpConfiguration CreateHttpConfiguration()
@@ -192,6 +188,13 @@ namespace Ping
                 case ReadPersistenceMode.PetaPoco:
                     container.Register<IReadModelRepository<PingSummary>, Persistence.PetaPoco.Repository>();
                     break;
+                case ReadPersistenceMode.MongoDB:
+                    //http://docs.mongodb.org/ecosystem/tutorial/use-csharp-driver/
+                    container.Register(factory => new MongoClient(_configuration.TenantConfigurator.GetReadModelConnectionString()), new PerContainerLifetime()); // Connect to localhost
+                    container.Register(factory =>  container.GetInstance<MongoClient>().GetServer(), new PerContainerLifetime());
+                    container.Register(factory => container.GetInstance<MongoServer>().GetDatabase("testes"));
+                    container.Register<IReadModelRepository<PingSummary>, Persistence.MongoDB.PingSummaryRepositoryMongoDB>();
+                    break;
 
                 default:
                     // Default is Entity Framework.
@@ -209,7 +212,7 @@ namespace Ping
 
             configuration.DataBaseIntegration(x =>
             {
-                x.ConnectionString = _configuration.TenantConfigurator.GetConnectionString();
+                x.ConnectionString = _configuration.TenantConfigurator.GetReadModelConnectionString();
                 x.IsolationLevel = IsolationLevel.ReadUncommitted;
                 x.Driver<Sql2008ClientDriver>();
                 x.Dialect<MsSql2012Dialect>();

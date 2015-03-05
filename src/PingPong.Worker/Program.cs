@@ -19,18 +19,25 @@ namespace PingPong.Worker
 
         private static IEnumerable<IModuleEngine> CreateModules()
         {
-            var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
-            var configuration = new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes") { ReceiveMessages = true };
+            // Mongo: "mongodb://localhost/testes"
+            // SQL: Server=.;Database=pingpong;Trusted_Connection=True;
+
+            var tenantConfiguratorPing = new TenantConfigurator("mongodb://localhost/testes", "Server=.;Database=pingpong;Trusted_Connection=True;");
+            var configurationPing = new MemoryConfiguration(tenantConfiguratorPing, "amqp://jf3l1x:password@localhost:5672/testes") { ReceiveMessages = true };
+
+            var tenantConfiguratorPong = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;", "Server=.;Database=pingpong;Trusted_Connection=True;");
+            var configurationPong = new MemoryConfiguration(tenantConfiguratorPong, "amqp://jf3l1x:password@localhost:5672/testes") { ReceiveMessages = true };
+
 
             return new List<IModuleEngine>()
             {
-                new Ping.Engine(configuration, new PingOptions
+                new Ping.Engine(configurationPing, new PingOptions
                 {
                     RunMode = RunMode.Sync,
-                    ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
+                    ReadModelPersistenceMode = ReadPersistenceMode.MongoDB,
                     WriteModelPersistenceMode = WritePersistenceMode.SqlServer
                 }),
-                new Pong.Engine(configuration, new PongOptions
+                new Pong.Engine(configurationPong, new PongOptions
                 {
                     ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
                     WriteModelPersistenceMode = WritePersistenceMode.SqlServer

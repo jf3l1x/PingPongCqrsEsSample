@@ -10,7 +10,7 @@ namespace Ping.Persistence.EntityFramework
     {
 
         public PingSummaryRepository(IGiveTenantConfiguration tenantConfiguration)
-            : base(tenantConfiguration.GetConnectionString())
+            : base(tenantConfiguration.GetReadModelConnectionString())
         {
             
         }

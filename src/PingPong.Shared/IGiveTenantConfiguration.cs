@@ -2,6 +2,7 @@
 {
     public interface IGiveTenantConfiguration
     {
-        string GetConnectionString();
+        string GetReadModelConnectionString();
+        string GetWriteModelConnectionString();
     }
 }

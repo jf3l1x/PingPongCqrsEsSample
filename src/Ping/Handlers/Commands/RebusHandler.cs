@@ -11,11 +11,14 @@ namespace Ping.Handlers.Commands
     {
         private readonly DefaultHandler _innerHandler;
         
+
         public RebusHandler(DefaultHandler innerHandler)
         {
             _innerHandler = innerHandler;
         }
-                
+
+        #region Events
+
         public virtual void Handle(PingResponseReceived message)
         {
             _innerHandler.Handle(message);
@@ -36,10 +39,9 @@ namespace Ping.Handlers.Commands
             _innerHandler.Handle(message);
         }
 
-        public virtual void Handle(ReceivePingResponse message)
-        {
-            _innerHandler.Handle(message);
-        }
+        #endregion
+        
+        #region Command
 
         public virtual void Handle(StartPing message)
         {
@@ -50,5 +52,14 @@ namespace Ping.Handlers.Commands
         {
             _innerHandler.Handle(message);
         }
+
+        public virtual void Handle(ReceivePingResponse message)
+        {
+            _innerHandler.Handle(message);
+        }
+
+        #endregion
+
     }
+
 }
