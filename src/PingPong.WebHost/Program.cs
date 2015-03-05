@@ -7,11 +7,11 @@ namespace PingPong.WebHost
     {
         private static void Main(string[] args)
         {
+            // Need run as admin.
             var options = new StartOptions("http://*:9999")
             {
                 ServerFactory = "Microsoft.Owin.Host.HttpListener"
             };
-            
             
             using (WebApp.Start<Startup>(options))
             {
