@@ -1,8 +1,10 @@
-﻿namespace Pong.Configuration
+﻿using PingPong.Shared;
+
+namespace Pong.Configuration
 {
     public class PongOptions
     {
-        public PersistenceMode WriteModelPersistenceMode { get; set; }
-        public PersistenceMode ReadModelPersistenceMode { get; set; }
+        public WritePersistenceMode WriteModelPersistenceMode { get; set; }
+        public ReadPersistenceMode ReadModelPersistenceMode { get; set; }
     }
 }

@@ -127,7 +127,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\PersistenceMode.cs" />
     <Compile Include="Configuration\PingOptions.cs" />
     <Compile Include="Configuration\RunMode.cs" />
     <Compile Include="Controllers\PingController.cs" />

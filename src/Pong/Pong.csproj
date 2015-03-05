@@ -99,7 +99,6 @@
   <ItemGroup>
     <Compile Include="Extensions\WireUpExtensions.cs" />
     <Compile Include="Persistence\Dapper\Repository.cs" />
-    <Compile Include="Configuration\PersistenceMode.cs" />
     <Compile Include="Configuration\PongOptions.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Persistence\EntityFramework\PongSummaryContext.cs" />

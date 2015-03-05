@@ -70,6 +70,7 @@
     <Compile Include="IGiveTenantConfiguration.cs" />
     <Compile Include="IModuleConfiguration.cs" />
     <Compile Include="IModuleEngine.cs" />
+    <Compile Include="PersistenceModes.cs" />
     <Compile Include="Snapshot.cs" />
     <Compile Include="IReadModelRepository.cs" />
     <Compile Include="IServiceBus.cs" />

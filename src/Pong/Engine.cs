@@ -18,6 +18,7 @@ using PingPong.Shared;
 using Pong.Configuration;
 using Pong.Handlers.Async;
 using Pong.Handlers.Commands;
+using Pong.Messages.ExternalEvents;
 using Pong.Model.Read;
 using Pong.Persistence.Dapper;
 using Pong.Persistence.EntityFramework;
@@ -48,10 +49,11 @@ namespace Pong
 
         public void StartListener()
         {
-            CreateContainer();
+            var container=CreateContainer();
+            container.GetInstance<IBus>().Subscribe<PongRequested>();
         }
 
-        private void CreateContainer()
+        private ServiceContainer CreateContainer()
         {
             var container = new ServiceContainer();
 
@@ -78,7 +80,7 @@ namespace Pong
                             t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors")
                                 .ManageSubscriptions()
                                 .UseExchange("Rebus")
-                                .AddEventNameResolver(type => "ESB"))
+                                .AddEventNameResolver(ResoulveTypeName))
                     .Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
                     .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                     .CreateBus().Start());
@@ -92,13 +94,23 @@ namespace Pong
                 .ConfigurePersistence(_options, container)
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>()).Build());
+            return container;
+        }
+
+        private string ResoulveTypeName(Type type)
+        {
+            if (type == typeof (PongRequested))
+                return "pongrequested";
+            if (type == typeof (PongSent))
+                return "pongsent";
+            return string.Empty;
         }
 
         private void ConfigureReadPersistenceModel(ServiceContainer container)
         {
             switch (_options.ReadModelPersistenceMode)
             {
-                case PersistenceMode.NHibernate:
+                case ReadPersistenceMode.NHibernate:
                     container.Register(factory => CreateNHibernateSessionFactory(factory),
                         new PerContainerLifetime());
                     container.Register(
@@ -107,10 +119,10 @@ namespace Pong
                                 .OpenStatelessSession());
                     container.Register<IReadModelRepository<PongSummary>, PongSummaryRepository>();
                     break;
-                case PersistenceMode.Dapper:
+                case ReadPersistenceMode.Dapper:
                     container.Register<IReadModelRepository<PongSummary>, Repository>();
                     break;
-                case PersistenceMode.PetaPoco:
+                case ReadPersistenceMode.PetaPoco:
                     container.Register<IReadModelRepository<PongSummary>, Persistence.PetaPoco.Repository>();
                     break;
                 default:

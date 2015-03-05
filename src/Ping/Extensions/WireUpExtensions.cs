@@ -9,6 +9,7 @@ using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
 using NEventStore.Serialization;
 using Ping.Configuration;
+using PingPong.Shared;
 
 namespace Ping.Extensions
 {
@@ -19,7 +20,7 @@ namespace Ping.Extensions
         {
             switch (options.WriteModelPersistenceMode)
             {
-                case PersistenceMode.GetEventStore:
+                case WritePersistenceMode.GetEventStore:
                     return target.UsingEventStorePersistence(
                         new EventStorePersistenceOptions
                         {
@@ -30,7 +31,7 @@ namespace Ping.Extensions
                         }, new JsonNetSerializer(),
                         new DefaultNamingStrategy());
 
-                case PersistenceMode.MongoDB:
+                case WritePersistenceMode.MongoDB:
                     return target.UsingMongoPersistence(() => "mongodb://localhost/testes", new DocumentObjectSerializer());
                     
                 default:

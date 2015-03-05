@@ -3,7 +3,6 @@ using Owin;
 ﻿using Ping.Configuration;
 ﻿using PingPong.Shared;
 using Pong.Configuration;
-using PersistenceMode = Ping.Configuration.PersistenceMode;
 
 namespace PingPong.WebHost
 {
@@ -24,7 +23,7 @@ namespace PingPong.WebHost
             container.RegisterInstance(new PingOptions
             {
                 RunMode = RunMode.Async,
-                ReadModelPersistenceMode = PersistenceMode.NHibernate
+                ReadModelPersistenceMode = ReadPersistenceMode.NHibernate
             });
 
             container.RegisterInstance(new PongOptions
