@@ -7,6 +7,7 @@ using NEventStore.Persistence.EventStore.Services;
 using NEventStore.Persistence.EventStore.Services.Naming;
 using NEventStore.Persistence.Sql;
 using NEventStore.Persistence.Sql.SqlDialects;
+using NEventStore.Serialization;
 using Ping.Configuration;
 
 namespace Ping.Extensions
@@ -28,6 +29,9 @@ namespace Ping.Extensions
                             MinimunSnapshotThreshold = 50
                         }, new JsonNetSerializer(),
                         new DefaultNamingStrategy());
+
+                case PersistenceMode.MongoDB:
+                    return target.UsingMongoPersistence(() => "mongodb://localhost/testes", new DocumentObjectSerializer());
                     
                 default:
                     return target.UsingSqlPersistence(container.GetInstance<IConnectionFactory>())

@@ -6,6 +6,7 @@
         NHibernate,
         PetaPoco,
         Dapper,
-        GetEventStore
+        GetEventStore,
+        MongoDB
     }
 }
