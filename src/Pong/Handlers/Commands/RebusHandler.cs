@@ -5,7 +5,7 @@ using Rebus;
 
 namespace Pong.Handlers.Commands
 {
-    internal class RebusHandler : IHandleMessages<PongRequested>,IHandleMessages<GeneratePong>,IHandleMessages<PongGenerated>
+    public class RebusHandler : IHandleMessages<PongRequested>,IHandleMessages<GeneratePong>,IHandleMessages<PongGenerated>
     {
         private readonly DefaultHandler _innerHandler;
 
@@ -14,17 +14,17 @@ namespace Pong.Handlers.Commands
             _innerHandler = innerHandler;
         }
 
-        public void Handle(PongRequested message)
+        public virtual void Handle(PongRequested message)
         {
             _innerHandler.Handle(message);
         }
 
-        public void Handle(GeneratePong message)
+        public virtual void Handle(GeneratePong message)
         {
             _innerHandler.Handle(message);
         }
 
-        public void Handle(PongGenerated message)
+        public virtual void Handle(PongGenerated message)
         {
             _innerHandler.Handle(message);
         }

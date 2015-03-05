@@ -17,7 +17,6 @@ namespace Ping.Handlers.Commands
         private readonly Lazy<IServiceBus> _bus;
         private readonly Lazy<IReadModelRepository<PingSummary>> _readModelRepository;
         
-
         public DefaultHandler(Func<IRepository> writeRepositoryFactory, Func<IServiceBus> busFactory,
             Func<IReadModelRepository<PingSummary>> readRepositoryFactory)
         {

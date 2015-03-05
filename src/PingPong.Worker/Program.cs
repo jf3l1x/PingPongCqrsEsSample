@@ -30,14 +30,14 @@ namespace PingPong.Worker
             container.RegisterInstance(new PingOptions
             {
                 RunMode = RunMode.Sync,
-                ReadModelPersistenceMode = PingPersistenceMode.EntityFramework,
-                WriteModelPersistenceMode = PingPersistenceMode.MongoDB
+                ReadModelPersistenceMode = PingPersistenceMode.NHibernate,
+                WriteModelPersistenceMode = PingPersistenceMode.EntityFramework
             });
 
             container.RegisterInstance(new PongOptions
             {
-                ReadModelPersistenceMode = PongPersistenceMode.EntityFramework,
-                WriteModelPersistenceMode = PongPersistenceMode.MongoDB
+                ReadModelPersistenceMode = PongPersistenceMode.NHibernate,
+                WriteModelPersistenceMode = PongPersistenceMode.EntityFramework
             });
             
             return container;

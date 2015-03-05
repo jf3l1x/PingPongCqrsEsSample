@@ -50,6 +50,9 @@
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
+    <Reference Include="LightInject.Interception">
+      <HintPath>..\packages\LightInject.Interception.1.0.0.7\lib\net45\LightInject.Interception.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject.WebApi">
       <HintPath>..\packages\LightInject.WebApi.1.0.0.3\lib\net45\LightInject.WebApi.dll</HintPath>
     </Reference>
@@ -158,6 +161,7 @@
     <Compile Include="Persistence\NHibernate\Mappings\PingSummaryMap.cs" />
     <Compile Include="Persistence\NHibernate\PingSummaryRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\InternalsVisibleTo.cs" />
     <Compile Include="Services\Default\AsynchronousBus.cs" />
     <Compile Include="Services\Default\MessageRouter.cs" />
     <Compile Include="Services\Default\MyContainerAdapter.cs" />

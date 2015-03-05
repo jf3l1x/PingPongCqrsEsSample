@@ -15,6 +15,7 @@ using NHibernate.Mapping.ByCode;
 using Owin;
 using Ping.Extensions;
 using PingPong.Shared;
+using PingPong.Shared.LightInject;
 using Pong.Configuration;
 using Pong.Handlers.Async;
 using Pong.Handlers.Commands;
@@ -69,7 +70,10 @@ namespace Pong
             container.Register<IContainerAdapter, MyContainerAdapter>();
             container.Register<IResolveTypes, DefaultTypeResolver>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
+
             container.Register<RebusHandler>();
+
+            ConfigureInterceptors(container);
 
             container.RegisterInstance(
                 Configure.With(container.GetInstance<IContainerAdapter>())
@@ -99,14 +103,11 @@ namespace Pong
             switch (_options.ReadModelPersistenceMode)
             {
                 case PersistenceMode.NHibernate:
-                    container.Register(factory => CreateNHibernateSessionFactory(factory),
-                        new PerContainerLifetime());
-                    container.Register(
-                        factory =>
-                            factory.GetInstance<ISessionFactory>()
-                                .OpenStatelessSession());
+                    container.Register(factory => CreateNHibernateSessionFactory(factory), new PerContainerLifetime());
+                    container.Register(factory => factory.GetInstance<ISessionFactory>().OpenStatelessSession(), new PerScopeLifetime());
                     container.Register<IReadModelRepository<PongSummary>, PongSummaryRepository>();
                     break;
+
                 case PersistenceMode.Dapper:
                     container.Register<IReadModelRepository<PongSummary>, Repository>();
                     break;
@@ -154,6 +155,12 @@ namespace Pong
             ISessionFactory sessionFactory = configuration.BuildSessionFactory();
 
             return sessionFactory;
+        }
+
+        private void ConfigureInterceptors(ServiceContainer container)
+        {
+            // All Handle methods of RebusHandler class are Begin Scope.
+            container.Intercept(x => x.ServiceType == typeof(RebusHandler), (sf, pd) => pd.Implement(() => new BeginScopeInterceptor(container), m => m.Name == "Handle"));
         }
     }
 

@@ -13,6 +13,7 @@ using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
 using LightInject;
+using LightInject.Interception;
 using NEventStore;
 using NEventStore.Persistence.EventStore;
 using NEventStore.Persistence.EventStore.Services;
@@ -33,15 +34,17 @@ using Ping.Handlers.Commands;
 using Ping.Handlers.Sync;
 using Ping.Model.Read;
 using Ping.Persistence.Dapper;
-using Ping.Persistence.EntityFramework;
+using Ping.Persistence.NHibernate;
 using Ping.Persistence.NHibernate.Mappings;
 using Ping.Services.Default;
 using PingPong.Shared;
+using PingPong.Shared.LightInject;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.RabbitMQ;
 using DefaultNamingStrategy = NEventStore.Persistence.EventStore.Services.Naming.DefaultNamingStrategy;
 using NHibernateConfiguration = NHibernate.Cfg.Configuration;
+using PingSummaryRepository = Ping.Persistence.EntityFramework.PingSummaryRepository;
 
 namespace Ping
 {
@@ -107,7 +110,10 @@ namespace Ping
             container.Register<IMutateMessages, DefaultMessageMutator>();
             
             container.Register<IConnectionFactory,TenantConnectionFactory>();
+
             container.Register<RebusHandler>();
+
+            ConfigureInterceptors(container);
 
             if (_configuration.ReceiveMessages)
             {
@@ -150,24 +156,30 @@ namespace Ping
             return container;
         }
 
+        private void ConfigureInterceptors(ServiceContainer container)
+        {
+            // All Handle methods of RebusHandler class are Begin Scope.
+            container.Intercept(x => x.ServiceType == typeof(RebusHandler), (sf, pd) => pd.Implement(() => new BeginScopeInterceptor(container), m => m.Name == "Handle"));
+        }
+
         private void ConfigureReadPersistenceModel(ServiceContainer container)
         {
             switch (_options.ReadModelPersistenceMode)
             {
                 case PersistenceMode.NHibernate:
-                    container.Register<ISessionFactory>(factory => CreateNHibernateSessionFactory(factory),
-                        new PerContainerLifetime());
-                    container.Register<IStatelessSession>(
-                        factory =>
-                            factory.GetInstance<ISessionFactory>().OpenStatelessSession());
+                    container.Register(factory => CreateNHibernateSessionFactory(factory), new PerContainerLifetime());
+                    container.Register(factory => factory.GetInstance<ISessionFactory>().OpenStatelessSession(), new PerScopeLifetime());
                     container.Register<IReadModelRepository<PingSummary>, Persistence.NHibernate.PingSummaryRepository>();
                     break;
+
                 case PersistenceMode.Dapper:
                     container.Register<IReadModelRepository<PingSummary>, Persistence.Dapper.Repository>();
                     break;
+
                 case PersistenceMode.PetaPoco:
                     container.Register<IReadModelRepository<PingSummary>, Persistence.PetaPoco.Repository>();
                     break;
+
                 default:
                     // Default is Entity Framework.
                     container.Register<IReadModelRepository<PingSummary>, PingSummaryRepository>();
@@ -190,7 +202,6 @@ namespace Ping
                 x.Dialect<MsSql2012Dialect>();
                 x.BatchSize = 50;
                 x.Timeout = 30;
-
 #if DEBUG
                 x.LogSqlInConsole = true;
                 x.LogFormattedSql = true;

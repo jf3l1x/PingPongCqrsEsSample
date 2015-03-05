@@ -11,7 +11,7 @@ using Pong.Model.Read;
 
 namespace Pong.Handlers.Commands
 {
-    internal class DefaultHandler : IHandle<GeneratePong>, IHandle<PongGenerated>, IHandle<PongRequested>
+    public class DefaultHandler : IHandle<GeneratePong>, IHandle<PongGenerated>, IHandle<PongRequested>
     {
         private readonly Func<IRepository> _writeRepositoryFactory;
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NHibernate;
 using NHibernate.Linq;
 using PingPong.Shared;
@@ -8,37 +9,55 @@ namespace Pong.Persistence.NHibernate
 {
     public class PongSummaryRepository : IReadModelRepository<PongSummary>
     {
-        private readonly IStatelessSession _session;
+        private readonly Func<IStatelessSession> _sessionFactory;
 
-        public PongSummaryRepository(IStatelessSession session)
+        public PongSummaryRepository(Func<IStatelessSession> sessionFactory)
         {
-            _session = session;
+            _sessionFactory = sessionFactory;
         }
 
         public void Create(PongSummary obj)
         {
-            _session.Update(obj);
+            var session = _sessionFactory();
+
+            using (var transaction=session.BeginTransaction())
+            {
+                session.Insert(obj);    
+                transaction.Commit();
+            }
         }
 
         public PongSummary Retrieve(object id)
         {
-            return _session.Get<PongSummary>(id);
+            return _sessionFactory().Get<PongSummary>(id);
         }
 
         public IQueryable<PongSummary> Query()
         {
-            return _session.Query<PongSummary>();
+            return _sessionFactory().Query<PongSummary>();
         }
 
         public void Update(PongSummary obj)
         {
-            _session.Update(obj);
+            var session = _sessionFactory();
+            
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Update(obj);
+                transaction.Commit();
+            }
         }
 
         public void Delete(PongSummary obj)
         {
-            var toDelete = _session.Get<PongSummary>(obj.Id);
-            _session.Delete(toDelete);
+            var session = _sessionFactory();
+
+            using (var transaction = session.BeginTransaction())
+            {
+                var toDelete = session.Get<PongSummary>(obj.Id);
+                session.Delete(toDelete);
+                transaction.Commit();
+            }
         }
     }
 }
