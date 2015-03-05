@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -20,16 +21,11 @@ namespace Ping.Controllers
 
         [EnableQuery]
         [ODataRoute]
-        public IHttpActionResult GetFeed()
+        public Task<IQueryable<PingSummary>> Get()
         {
-            return Ok(_repository.Query());
+            return Task.FromResult(_repository.Query());
         }
 
-        [ODataRoute("({id})")]
-        [EnableQuery]
-        public IHttpActionResult GetEntity(Guid id)
-        {
-            return Ok(SingleResult.Create(_repository.Query().Where(t => t.Id == id)));
-        }
+      
     }
 }
