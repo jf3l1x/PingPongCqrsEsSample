@@ -1,43 +1,33 @@
 ﻿using System;
-using System.Linq;
 using CommonDomain;
 using CommonDomain.Persistence;
+using CommonDomain.Persistence.EventStore;
+using Constant.Hosting.Rebus;
 using Constant.Module.Interfaces;
+using Constant.Module.Interfaces.Bus;
 using Constant.Module.Interfaces.Configuration;
+using Constant.Module.Interfaces.Persistence.ReadModel;
 using LightInject;
 using NEventStore;
 using NEventStore.Persistence.Sql;
+using NEventStore.Persistence.Sql.SqlDialects;
 using Ping.Shared.Messages.ExternalEvents;
 using Ping.Shared.Model.Read;
-using Ping.Worker.Configuration;
-using Ping.Worker.Extensions;
-using Ping.Worker.Handlers.Async;
-using Ping.Worker.Handlers.Commands;
-using Ping.Worker.Handlers.Sync;
+using Ping.Shared.Services;
+using Ping.Worker.Handlers;
 using Ping.Worker.Persistence.Dapper;
-using Ping.Worker.Persistence.EntityFramework;
-using Ping.Worker.Services.Default;
-using PingPong.Shared;
-using Rebus;
-using Rebus.Configuration;
+using Ping.Worker.Services;
 using Rebus.RabbitMQ;
 
 namespace Ping.Worker
 {
-    public class Engine : IWorkerModule
+    public class Engine : MarshalByRefObject, IWorkerModule
     {
-        private readonly IModuleConfiguration _configuration;
-        private readonly PingOptions _options;
-
-        public Engine(IModuleConfiguration configuration, PingOptions options)
+        public void Start(IWorkerModuleContainer wmc)
         {
-            _configuration = configuration;
-            _options = options;
-        }
-
-        public void Start(IWorkerModuleContainer container)
-        {
-            throw new NotImplementedException();
+            var container = CreateContainer(wmc);
+            var bus = container.GetInstance<IServiceBus>();
+            bus.Start();
         }
 
         public void Stop()
@@ -46,73 +36,35 @@ namespace Ping.Worker
         }
 
 
-        private ServiceContainer CreateContainer()
+        private ServiceContainer CreateContainer(IWorkerModuleContainer factory)
         {
             var container = new ServiceContainer();
 
             container.Register<DefaultHandler>();
 
-            container.RegisterInstance(_configuration.TenantConfigurator);
-            container.Register<IRepository, EventStoreRepositoryWithSnapshot>();
+            container.RegisterInstance(factory.CreateTenantConfiguration());
+            container.Register<IRepository, EventStoreRepository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
 
             ConfigureReadPersistenceModel(container);
-
-            container.Register<IDetermineMessageOwnership, MessageRouter>();
-            container.Register<IResolveTypes, DefaultTypeResolver>();
+            container.Register<DefaultHandler>();
+            container.Register<IActivateHandlers,HandlerActivator>();
+            container.Register<IRouteMessages, MessageRouter>();
+            container.Register<IResolveTypeName, TypeNameResolver>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
+            container.Register<IConnectionFactory, SqlConnectionFactory>();
 
-            container.Register<IConnectionFactory, TenantConnectionFactory>();
-            container.Register<RebusHandler>();
 
-            if (_configuration.ReceiveMessages)
-            {
-                IBus b;
+            RegisterRebus(container);
 
-                container.RegisterInstance(
-                    Configure
-                        .With(
-                            container.GetInstance<IContainerAdapter>())
-                        .Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                        .Transport(
-                            t =>
-                                t.UseRabbitMq(_configuration.BusConnectionString, "ping", "pingErrors")
-                                    .ManageSubscriptions()
-                                    .UseExchange("Rebus")
-                                    .AddEventNameResolver(ResolveTypeName))
-                        .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
-                        .CreateBus().Start());
-            }
-            else
-            {
-                container.RegisterInstance(
-                    Configure.With(container.GetInstance<IContainerAdapter>())
-                        .Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
-                        .Transport(
-                            t =>
-                                t.UseRabbitMqInOneWayMode(_configuration.BusConnectionString)
-                                    .ManageSubscriptions()
-                                    .UseExchange("Rebus")
-                                    .AddEventNameResolver(ResolveTypeName))
-                        .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
-                        .CreateBus().Start());
-            }
 
-            container.Register<IPipelineHook, SendToBus>();
+            container.Register<IPipelineHook, InvokeHandler>();
 
-            if (_options.RunMode == RunMode.Sync)
-            {
-                container.Register<ICreateHandlers, SynchronousCmdHandlerFactory>();
-                container.Register<IServiceBus, SynchronousBus>();
-            }
-            else
-            {
-                container.Register<IServiceBus, AsynchronousBus>();
-                container.Register<ICreateHandlers, AsynchronousHandler>();
-            }
+
             container.RegisterInstance(Wireup.Init()
-                .ConfigurePersistence(_options, container)
+                .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
+                .WithDialect(new MsSqlDialect())
                 .UsingJsonSerialization()
                 .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>())
                 .Build());
@@ -120,42 +72,31 @@ namespace Ping.Worker
             return container;
         }
 
-        private string ResolveTypeName(Type type)
+        private void RegisterRebus(ServiceContainer container)
         {
-            if (type == typeof (PongRequested))
-                return "pongrequested";
-            if (type == typeof (PongSent))
-                return "pongsent";
-            return string.Empty;
+            var bus = new RebusAdapter();
+            bus.RegisterActivatorFactory(container.GetInstance<IActivateHandlers>);
+            bus.RegisterMutators(container.GetAllInstances<IMutateMessages>());
+            bus.SetMessageRouter(container.GetInstance<IRouteMessages>());
+            bus.GetConfigurator().Transport(transport =>
+            {
+                RabbitMqOptions options = transport.UseRabbitMq(
+                    container.GetInstance<IGiveTenantConfiguration>().GetBusConnectionString(), "ping", "pingErrors")
+                    .ManageSubscriptions()
+                    .UseExchange("Rebus");
+                foreach (var resolver in container.GetAllInstances<IResolveTypeName>())
+                {
+                    var r = resolver;
+                    options.AddEventNameResolver(r.Resolve);
+                }
+            });
+            
+            container.RegisterInstance<IServiceBus>(bus);
         }
 
         private void ConfigureReadPersistenceModel(ServiceContainer container)
         {
-            switch (_options.ReadModelPersistenceMode)
-            {
-                case ReadPersistenceMode.Dapper:
-                    container.Register<IReadModelRepository<PingSummary>, Repository>();
-                    break;
-                case ReadPersistenceMode.PetaPoco:
-                    container.Register<IReadModelRepository<PingSummary>, Persistence.PetaPoco.Repository>();
-                    break;
-                default:
-                    // Default is Entity Framework.
-                    container.Register<IReadModelRepository<PingSummary>, PingSummaryRepository>();
-                    break;
-            }
-        }
-    }
-
-    internal class DefaultTypeResolver : IResolveTypes
-    {
-        public Type ResolveType(string eventName)
-        {
-            return
-                typeof (Engine).Assembly.GetTypes()
-                    .FirstOrDefault(
-                        t =>
-                            String.Compare(t.Name, eventName, StringComparison.InvariantCultureIgnoreCase) == 0);
+            container.Register<IReadRepository<PingSummary>, Repository>();
         }
     }
 }

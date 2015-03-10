@@ -1,7 +1,7 @@
 ﻿using Constant.Module.Interfaces.Bus;
 using Newtonsoft.Json;
 
-namespace Ping.Shared
+namespace Ping.Shared.Services
 {
     public class DefaultMessageMutator : IMutateMessages
     {
@@ -27,7 +27,7 @@ namespace Ping.Shared
             return new BusMessage
             {
                 Content = JsonConvert.SerializeObject(message),
-                EventName = message.GetType().Name
+                EventName = message.GetType().AssemblyQualifiedName
             };
         }
     }

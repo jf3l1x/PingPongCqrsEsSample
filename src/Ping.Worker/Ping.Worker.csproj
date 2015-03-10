@@ -71,30 +71,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Configuration\PingOptions.cs" />
-    <Compile Include="Configuration\RunMode.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="Extensions\WireUpExtensions.cs" />
-    <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
-    <Compile Include="Handlers\Commands\DefaultHandler.cs" />
-    <Compile Include="Handlers\Commands\RebusHandler.cs" />
-    <Compile Include="Handlers\Sync\SynchronousCmdHandlerFactory.cs" />
-    <Compile Include="ICreateHandlers.cs" />
-    <Compile Include="IHandle.cs" />
+    <Compile Include="Handlers\DefaultHandler.cs" />
     <Compile Include="Persistence\Dapper\Repository.cs" />
-    <Compile Include="Persistence\EntityFramework\PingSummaryRepository.cs" />
-    <Compile Include="Persistence\PetaPoco\PetaPoco.cs" />
-    <Compile Include="Persistence\PetaPoco\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\Default\AggregateFactory.cs" />
-    <Compile Include="Services\Default\AsynchronousBus.cs" />
-    <Compile Include="Services\Default\InvokeHandler.cs" />
-    <Compile Include="Services\Default\MessageRouter.cs" />
-    <Compile Include="Services\Default\NullConflictDetection.cs" />
-    <Compile Include="Services\Default\SendToBus.cs" />
-    <Compile Include="Services\Default\SynchronousBus.cs" />
-    <Compile Include="Services\Default\TenantConnectionFactory.cs" />
+    <Compile Include="Services\AggregateFactory.cs" />
+    <Compile Include="Services\HandlerActivator.cs" />
+    <Compile Include="Services\InvokeHandler.cs" />
+    <Compile Include="Services\NullConflictDetection.cs" />
+    <Compile Include="Services\SqlConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -105,10 +90,6 @@
     <ProjectReference Include="..\Ping.Shared\Ping.Shared.csproj">
       <Project>{F6FC76C7-6596-4611-9DE5-2726BA64052D}</Project>
       <Name>Ping.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PingPong.Shared\PingPong.Shared.csproj">
-      <Project>{81ff700e-cd70-482f-a800-336e178c2a4f}</Project>
-      <Name>PingPong.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

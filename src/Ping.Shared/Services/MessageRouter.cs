@@ -1,9 +1,9 @@
 ﻿using System;
 using Constant.Module.Interfaces.Bus;
 
-namespace Ping.Web.Services.Default
+namespace Ping.Shared.Services
 {
-    internal class MessageRouter : IRouteMessages
+    public class MessageRouter : IRouteMessages
     {
         public string DestinationFor(Type t)
         {

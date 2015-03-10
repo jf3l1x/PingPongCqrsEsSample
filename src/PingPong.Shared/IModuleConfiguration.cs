@@ -1,4 +1,6 @@
-﻿namespace PingPong.Shared
+﻿using Constant.Module.Interfaces.Configuration;
+
+namespace PingPong.Shared
 {
     public interface IModuleConfiguration
     {

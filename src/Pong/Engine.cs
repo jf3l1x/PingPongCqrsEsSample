@@ -141,7 +141,7 @@ namespace Pong
 
             configuration.DataBaseIntegration(x =>
             {
-                x.ConnectionString = _configuration.TenantConfigurator.GetConnectionString();
+                x.ConnectionString = _configuration.TenantConfigurator.GetReadModelConnectionString();
                 x.IsolationLevel = IsolationLevel.ReadUncommitted;
                 x.Driver<Sql2008ClientDriver>();
                 x.Dialect<MsSql2012Dialect>();

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CommonDomain;
 
-namespace Ping.Worker.Services.Default
+namespace Ping.Worker.Services
 {
     public class NullConflictDetection : IDetectConflicts
     {

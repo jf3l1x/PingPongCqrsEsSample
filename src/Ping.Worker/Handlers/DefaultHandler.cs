@@ -1,29 +1,32 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CommonDomain.Core;
 using CommonDomain.Persistence;
+using Constant.Module.Interfaces.Bus;
+using Constant.Module.Interfaces.Persistence.ReadModel;
 using Ping.Shared.Messages.Commands;
 using Ping.Shared.Messages.Events;
 using Ping.Shared.Messages.ExternalEvents;
 using Ping.Shared.Model.Domain;
 using Ping.Shared.Model.Read;
-using PingPong.Shared;
 
-namespace Ping.Worker.Handlers.Commands
+
+namespace Ping.Worker.Handlers
 {
-    public class DefaultHandler : IHandle<StartPing>, IHandle<StopPing>, IHandle<ReceivePingResponse>,
-        IHandle<PingResponseReceived>, IHandle<PingStarted>, IHandle<PingStopped>, IHandle<PongSent>
+    public class DefaultHandler : IHandleMessages<StartPing>, IHandleMessages<StopPing>, IHandleMessages<ReceivePingResponse>,
+        IHandleMessages<PingResponseReceived>, IHandleMessages<PingStarted>, IHandleMessages<PingStopped>, IHandleMessages<PongSent>
     {
         private readonly Lazy<IServiceBus> _bus;
-        private readonly Lazy<IReadModelRepository<PingSummary>> _readModelRepository;
+        private readonly Lazy<IReadRepository<PingSummary>> _readModelRepository;
         private readonly Func<IRepository> _writeRepositoryFactory;
 
 
         public DefaultHandler(Func<IRepository> writeRepositoryFactory, Func<IServiceBus> busFactory,
-            Func<IReadModelRepository<PingSummary>> readRepositoryFactory)
+            Func<IReadRepository<PingSummary>> readRepositoryFactory)
         {
             _writeRepositoryFactory = writeRepositoryFactory;
             _bus = new Lazy<IServiceBus>(busFactory);
-            _readModelRepository = new Lazy<IReadModelRepository<PingSummary>>(readRepositoryFactory);
+            _readModelRepository = new Lazy<IReadRepository<PingSummary>>(readRepositoryFactory);
         }
 
         public void Handle(PingResponseReceived evt)
@@ -36,6 +39,11 @@ namespace Ping.Worker.Handlers.Commands
                                          DateTimeOffset.UtcNow.Subtract(summary.Start).TotalSeconds;
                 _readModelRepository.Value.Update(summary);
             }
+        }
+
+        public Task HandleAsync(PingResponseReceived message)
+        {
+            return Task.Run(() => Handle(message));
         }
 
         public void Handle(PingStarted evt)
@@ -63,6 +71,11 @@ namespace Ping.Worker.Handlers.Commands
             }
         }
 
+        public Task HandleAsync(PingStarted message)
+        {
+            return Task.Run(() => Handle(message));
+        }
+
         public void Handle(PingStopped evt)
         {
             PingSummary summary = _readModelRepository.Value.Retrieve(evt.AggregateId);
@@ -74,6 +87,11 @@ namespace Ping.Worker.Handlers.Commands
             }
         }
 
+        public Task HandleAsync(PingStopped message)
+        {
+            return Task.Run(() => Handle(message));
+        }
+
         public void Handle(PongSent msg)
         {
             _bus.Value.Send(new ReceivePingResponse
@@ -81,6 +99,11 @@ namespace Ping.Worker.Handlers.Commands
                 AggregateId = msg.PingId,
                 ResponseTime = msg.SendTime
             });
+        }
+
+        public Task HandleAsync(PongSent message)
+        {
+            return Task.Run(() => Handle(message));
         }
 
         public void Handle(ReceivePingResponse cmd)
@@ -103,6 +126,11 @@ namespace Ping.Worker.Handlers.Commands
             }
         }
 
+        public Task HandleAsync(ReceivePingResponse message)
+        {
+            return Task.Run(() => Handle(message));
+        }
+
         public void Handle(StartPing cmd)
         {
             using (IRepository repository = _writeRepositoryFactory())
@@ -119,6 +147,11 @@ namespace Ping.Worker.Handlers.Commands
             }
         }
 
+        public Task HandleAsync(StartPing message)
+        {
+            return Task.Run(() => Handle(message));
+        }
+
         public void Handle(StopPing cmd)
         {
             using (IRepository repository = _writeRepositoryFactory())
@@ -129,6 +162,11 @@ namespace Ping.Worker.Handlers.Commands
 
                 repository.Save(ping, Guid.NewGuid());
             }
+        }
+
+        public Task HandleAsync(StopPing message)
+        {
+            return Task.Run(() => Handle(message));
         }
     }
 }

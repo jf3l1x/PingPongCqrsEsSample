@@ -9,6 +9,7 @@ using LightInject;
 using Owin;
 using Ping.Shared;
 using Ping.Shared.Model.Read;
+using Ping.Shared.Services;
 using Ping.Web.Persistence.Dapper;
 using Ping.Web.Services;
 using Ping.Web.Services.Default;

@@ -1,31 +1,33 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace PingPong.Shared
 {
-    public class TenantConfigurator : IGiveTenantConfiguration
+    [Serializable]
+    public class TenantConfigurator : Constant.Module.Interfaces.Configuration.IGiveTenantConfiguration
     {
-        private readonly string _connectionString;
-
-
-        public TenantConfigurator(string connectionString)
+        public T GetValue<T>(string name)
         {
-            _connectionString = connectionString;
+            return default(T);
         }
 
-        public string GetConnectionString()
+        public object GetValue(string name)
         {
-            return _connectionString;
+            return null;
         }
 
-      
-
-        public override string ToString()
+        public string GetReadModelConnectionString()
         {
-            
-           
-                return string.Format("{0}:{1}", "default", _connectionString);
-            
+            return "Server=.;Database=pingpong;Trusted_Connection=True;";
+        }
+
+        public string GetWriteModelConnectionString()
+        {
+            return "Server=.;Database=pingpong;Trusted_Connection=True;";
+        }
+
+        public string GetBusConnectionString()
+        {
+            return "amqp://jf3l1x:password@localhost:5672/testes";
         }
     }
 }

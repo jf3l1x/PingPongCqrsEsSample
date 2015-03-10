@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using Constant.Module.Interfaces.Configuration;
 using PingPong.Shared;
 using Pong.Model.Read;
 
@@ -9,7 +10,7 @@ namespace Pong.Persistence.EntityFramework
     internal class PongSummaryContext : DbContext, IReadModelRepository<PongSummary>
     {
 
-        public PongSummaryContext(IGiveTenantConfiguration tenantConfiguration) : base(tenantConfiguration.GetConnectionString())
+        public PongSummaryContext(IGiveTenantConfiguration tenantConfiguration) : base(tenantConfiguration.GetReadModelConnectionString())
         {
             Database.SetInitializer(new CreateDatabaseIfNotExists<PongSummaryContext>());
         }

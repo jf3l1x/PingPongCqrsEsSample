@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using Constant.Module.Interfaces.Configuration;
 using NEventStore.Persistence.Sql;
 using PingPong.Shared;
 
@@ -17,7 +18,7 @@ namespace Pong.Services.Default
 
         public IDbConnection Open()
         {
-            var connection = new SqlConnection(_tenantConfigurator.GetConnectionString());
+            var connection = new SqlConnection(_tenantConfigurator.GetReadModelConnectionString());
             connection.Open();
             return connection;
         }

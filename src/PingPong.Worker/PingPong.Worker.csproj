@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Constant.Hosting.Rebus">
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Debug\Constant.Hosting.Rebus.dll</HintPath>
+    </Reference>
     <Reference Include="Constant.Module.Interfaces">
       <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
     </Reference>
@@ -50,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorkerModuleContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

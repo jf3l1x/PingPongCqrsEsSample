@@ -1,4 +1,5 @@
 ﻿using Constant.Module.Interfaces;
+using Constant.Module.Interfaces.Configuration;
 using LightInject;
 using Owin;
 using Ping.Web.Configuration;
@@ -20,7 +21,8 @@ namespace PingPong.WebHost
         private static ServiceContainer CreateInjectorContainer()
         {
             var container = new ServiceContainer();
-            container.RegisterInstance(Configure());
+            container.Register<IGiveTenantConfiguration,TenantConfigurator>();
+            container.Register<IModuleConfiguration,MemoryConfiguration>();
            
             container.RegisterInstance(new PongOptions
             {
@@ -35,12 +37,6 @@ namespace PingPong.WebHost
         }
 
        
-        private static IModuleConfiguration Configure()
-        {
-            var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
-            
-
-            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes");
-        }
+       
     }
 }

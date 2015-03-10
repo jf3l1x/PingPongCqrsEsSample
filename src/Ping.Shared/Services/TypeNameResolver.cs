@@ -2,9 +2,9 @@
 using Constant.Module.Interfaces.Bus;
 using Ping.Shared.Messages.ExternalEvents;
 
-namespace Ping.Web.Services.Default
+namespace Ping.Shared.Services
 {
-    internal class TypeNameResolver : IResolveTypeName
+    public class TypeNameResolver : IResolveTypeName
     {
         public string Resolve(Type t)
         {
@@ -12,7 +12,7 @@ namespace Ping.Web.Services.Default
                 return "pongrequested";
             if (t == typeof (PongSent))
                 return "pongsent";
-            return string.Empty;
+            return t.FullName;
         }
 
         public Type Resolve(string name)
@@ -21,7 +21,7 @@ namespace Ping.Web.Services.Default
                 return typeof(PongRequested);
             if (name == "pongsent")
                 return typeof(PongSent);
-            return typeof (object);
+            return Type.GetType(name);
         }
     }
 }

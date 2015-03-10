@@ -1,13 +1,14 @@
 ﻿using System.Text;
+using Constant.Module.Interfaces.Configuration;
 
 namespace PingPong.Shared
 {
     public class MemoryConfiguration : IModuleConfiguration
     {
-        public MemoryConfiguration(IGiveTenantConfiguration tenantConfigurator, string busConnectionString)
+        public MemoryConfiguration(IGiveTenantConfiguration tenantConfigurator)
         {
             TenantConfigurator = tenantConfigurator;
-            BusConnectionString = busConnectionString;
+            BusConnectionString = "amqp://jf3l1x:password@localhost:5672/testes";
         }
 
         public IGiveTenantConfiguration TenantConfigurator { get; private set; }

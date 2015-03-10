@@ -70,7 +70,6 @@
     <Compile Include="DefaultMessageMutator.cs" />
     <Compile Include="EntityFramework\Config.cs" />
     <Compile Include="EventStoreRepositoryWithSnapshot.cs" />
-    <Compile Include="IGiveTenantConfiguration.cs" />
     <Compile Include="IModuleConfiguration.cs" />
     <Compile Include="IModuleEngine.cs" />
     <Compile Include="PersistenceModes.cs" />

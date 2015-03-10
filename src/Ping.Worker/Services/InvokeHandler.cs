@@ -1,10 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Constant.Module.Interfaces.Bus;
 using NEventStore;
 
-namespace Ping.Web.Services.Default
+namespace Ping.Worker.Services
 {
     internal class InvokeHandler : IPipelineHook
     {
@@ -52,21 +53,30 @@ namespace Ping.Web.Services.Default
         private void Send(object msg)
         {
             MethodInfo create = null;
-            MethodInfo handle = null;
+            MethodInfo interfaceMethod = null;
             if (!Creates.TryGetValue(msg.GetType(), out create))
             {
                 create = _createMethod.MakeGenericMethod(msg.GetType());
 
                 Creates.Add(msg.GetType(), create);
             }
-            object handler = create.Invoke(_handlerFactory, null);
-            if (!Handles.TryGetValue(msg.GetType(), out handle))
-            {
-                handle = handler.GetType().GetMethod("Handle", new[] {msg.GetType()});
-                Handles.Add(msg.GetType(), handle);
-            }
+            var collection = (IEnumerable)create.Invoke(_handlerFactory, null);
 
-            handle.Invoke(handler, new[] {msg});
+            if (!Handles.TryGetValue(msg.GetType(), out interfaceMethod))
+            {
+                interfaceMethod = typeof(IHandleMessages<>).MakeGenericType(msg.GetType()).GetMethod("Handle", new[] { msg.GetType() });
+                Handles.Add(msg.GetType(), interfaceMethod);
+                
+            }
+            if (interfaceMethod != null)
+            {
+                foreach (var handler in collection)
+                {
+                    interfaceMethod.Invoke(handler, new[] { msg });
+                } 
+            }
+           
+            
         }
     }
 }
