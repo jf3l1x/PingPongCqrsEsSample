@@ -1,4 +1,4 @@
-﻿namespace Ping.Configuration
+﻿namespace Ping.Web.Configuration
 {
     public enum RunMode
     {

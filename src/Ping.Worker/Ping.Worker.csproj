@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B4B5C967-F53E-44BD-9B9E-DD11238979BC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Ping.Worker</RootNamespace>
+    <AssemblyName>Ping.Worker</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Constant.Hosting.Rebus">
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Debug\Constant.Hosting.Rebus.dll</HintPath>
+    </Reference>
+    <Reference Include="Constant.Module.Interfaces">
+      <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper">
+      <HintPath>..\packages\Dapper.1.38\lib\net45\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="LightInject">
+      <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
+    </Reference>
+    <Reference Include="NEventStore">
+      <HintPath>..\packages\NEventStore.5.1.1\lib\net40\NEventStore.dll</HintPath>
+    </Reference>
+    <Reference Include="RabbitMQ.Client">
+      <HintPath>..\packages\RabbitMQ.Client.3.4.0\lib\net35\RabbitMQ.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Rebus">
+      <HintPath>..\packages\Rebus.0.80.0\lib\NET45\Rebus.dll</HintPath>
+    </Reference>
+    <Reference Include="Rebus.RabbitMQ">
+      <HintPath>..\packages\Rebus.RabbitMQ.0.80.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class1.cs" />
+    <Compile Include="Configuration\PingOptions.cs" />
+    <Compile Include="Configuration\RunMode.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="Extensions\WireUpExtensions.cs" />
+    <Compile Include="Handlers\Async\AsynchronousHandler.cs" />
+    <Compile Include="Handlers\Commands\DefaultHandler.cs" />
+    <Compile Include="Handlers\Commands\RebusHandler.cs" />
+    <Compile Include="Handlers\Sync\SynchronousCmdHandlerFactory.cs" />
+    <Compile Include="ICreateHandlers.cs" />
+    <Compile Include="IHandle.cs" />
+    <Compile Include="Persistence\Dapper\Repository.cs" />
+    <Compile Include="Persistence\EntityFramework\PingSummaryRepository.cs" />
+    <Compile Include="Persistence\PetaPoco\PetaPoco.cs" />
+    <Compile Include="Persistence\PetaPoco\Repository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Default\AggregateFactory.cs" />
+    <Compile Include="Services\Default\AsynchronousBus.cs" />
+    <Compile Include="Services\Default\InvokeHandler.cs" />
+    <Compile Include="Services\Default\MessageRouter.cs" />
+    <Compile Include="Services\Default\NullConflictDetection.cs" />
+    <Compile Include="Services\Default\SendToBus.cs" />
+    <Compile Include="Services\Default\SynchronousBus.cs" />
+    <Compile Include="Services\Default\TenantConnectionFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Ping.Shared\Ping.Shared.csproj">
+      <Project>{F6FC76C7-6596-4611-9DE5-2726BA64052D}</Project>
+      <Name>Ping.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PingPong.Shared\PingPong.Shared.csproj">
+      <Project>{81ff700e-cd70-482f-a800-336e178c2a4f}</Project>
+      <Name>PingPong.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

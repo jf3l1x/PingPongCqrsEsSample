@@ -11,7 +11,6 @@
     <AssemblyName>PingPong.Worker</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Constant.Module.Interfaces">
+      <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
@@ -54,13 +56,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Ping.Worker\Ping.Worker.csproj">
+      <Project>{b4b5c967-f53e-44bd-9b9e-dd11238979bc}</Project>
+      <Name>Ping.Worker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PingPong.Shared\PingPong.Shared.csproj">
       <Project>{81ff700e-cd70-482f-a800-336e178c2a4f}</Project>
       <Name>PingPong.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ping\Ping.csproj">
-      <Project>{d22c4478-a733-421e-bf44-33238e22cc30}</Project>
-      <Name>Ping</Name>
     </ProjectReference>
     <ProjectReference Include="..\Pong\Pong.csproj">
       <Project>{bf43bfb2-843d-488d-8641-42e50c57a9c0}</Project>
@@ -68,7 +70,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- 
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

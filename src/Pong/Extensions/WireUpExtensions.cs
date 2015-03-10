@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using EventStore.ClientAPI.SystemData;
+
 using LightInject;
 using NEventStore;
 using NEventStore.Persistence.EventStore;
@@ -21,19 +21,7 @@ namespace Ping.Extensions
         {
             switch (options.WriteModelPersistenceMode)
             {
-                case WritePersistenceMode.GetEventStore:
-                    return target.UsingEventStorePersistence(
-                        new EventStorePersistenceOptions
-                        {
-                            TcpeEndPoint = new IPEndPoint(IPAddress.Loopback, 1113),
-                            HttpEndPoint = new IPEndPoint(IPAddress.Loopback, 2113),
-                            UserCredentials = new UserCredentials("admin", "changeit"),
-                            MinimunSnapshotThreshold = 50
-                        }, new JsonNetSerializer(),
-                        new DefaultNamingStrategy());
-
-                case WritePersistenceMode.MongoDB:
-                    return target.UsingMongoPersistence(() => "mongodb://localhost/testes", new DocumentObjectSerializer());
+               
                     
                 default:
                     return target.UsingSqlPersistence(container.GetInstance<IConnectionFactory>())

@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Ping.Handlers;
-using Ping.Messages.Commands;
-using Ping.Model.Read;
-using PingPong.Shared;
+using Constant.Module.Interfaces.Bus;
+using Constant.Module.Interfaces.Persistence.ReadModel;
+using Ping.Shared.Messages.Commands;
+using Ping.Shared.Model.Read;
 
-namespace Ping.Controllers
+namespace Ping.Web.Controllers
 {
-    
     public class PingController : ApiController
     {
-        private readonly ICreateHandlers _cmdHandleFactory;
-        private readonly IReadModelRepository<PingSummary> _repository;
+        private readonly ISendMessages _msgSender;
+        private readonly IReadFromRepository<PingSummary> _repository;
 
-        public PingController(ICreateHandlers cmdHandleFactory,IReadModelRepository<PingSummary> repository)
+        public PingController(ISendMessages msgSender, IReadFromRepository<PingSummary> repository)
         {
-            _cmdHandleFactory = cmdHandleFactory;
+            _msgSender = msgSender;
             _repository = repository;
         }
 
@@ -28,39 +26,38 @@ namespace Ping.Controllers
         {
             return Task.FromResult("ping");
         }
-        
+
         [HttpGet]
         [Route("List")]
         public Task<IEnumerable<PingSummary>> List()
         {
             return Task.FromResult(_repository.Query().AsEnumerable());
         }
+
         [Route("Start")]
         [HttpPost]
         public Task<Guid> Start(int countLimit, int timeLimit)
         {
-            var cmd = new StartPing()
+            var cmd = new StartPing
             {
                 CountLimit = countLimit,
                 TimeLimit = TimeSpan.FromSeconds(timeLimit),
                 AggregateId = Guid.NewGuid()
             };
-            _cmdHandleFactory.Create<StartPing>().Handle(cmd);
+            _msgSender.Send(cmd);
             return Task.FromResult(cmd.AggregateId);
-
         }
+
         [Route("Stop")]
         [HttpPost]
         public Task Stop(Guid id)
         {
-            var cmd = new StopPing()
+            var cmd = new StopPing
             {
-
                 AggregateId = id
             };
-            _cmdHandleFactory.Create<StopPing>().Handle(cmd);
+            _msgSender.Send(cmd);
             return Task.FromResult(0);
-
         }
     }
 }

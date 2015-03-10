@@ -11,7 +11,6 @@
     <AssemblyName>PingPong.WebHost</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Constant.Hosting.Rebus">
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Debug\Constant.Hosting.Rebus.dll</HintPath>
+    </Reference>
+    <Reference Include="Constant.Module.Interfaces">
+      <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
@@ -48,6 +53,18 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="RabbitMQ.Client, Version=3.4.0.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\RabbitMQ.Client.3.4.0\lib\net35\RabbitMQ.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rebus.0.80.0\lib\NET45\Rebus.dll</HintPath>
+    </Reference>
+    <Reference Include="Rebus.RabbitMQ, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rebus.RabbitMQ.0.80.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -61,6 +78,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="WebModuleContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -71,9 +89,9 @@
       <Project>{81ff700e-cd70-482f-a800-336e178c2a4f}</Project>
       <Name>PingPong.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ping\Ping.csproj">
+    <ProjectReference Include="..\Ping\Ping.Web.csproj">
       <Project>{d22c4478-a733-421e-bf44-33238e22cc30}</Project>
-      <Name>Ping</Name>
+      <Name>Ping.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Pong\Pong.csproj">
       <Project>{bf43bfb2-843d-488d-8641-42e50c57a9c0}</Project>
@@ -81,7 +99,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

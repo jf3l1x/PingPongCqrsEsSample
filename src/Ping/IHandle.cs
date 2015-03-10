@@ -1,4 +1,4 @@
-﻿namespace Ping
+﻿namespace Ping.Web
 {
     
     public interface IHandle<T>

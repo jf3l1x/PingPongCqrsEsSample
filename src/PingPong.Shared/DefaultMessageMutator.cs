@@ -4,7 +4,7 @@ using Rebus;
 
 namespace PingPong.Shared
 {
-    public class DefaultMessageMutator:IMutateMessages
+    public class DefaultMessageMutator : IMutateMessages
     {
         private readonly IResolveTypes _resolver;
 

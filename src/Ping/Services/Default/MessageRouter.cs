@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using Ping.Messages.Commands;
-using Ping.Messages.Events;
-using Ping.Messages.ExternalEvents;
-using Rebus;
+using Constant.Module.Interfaces.Bus;
 
-namespace Ping.Services.Default
+namespace Ping.Web.Services.Default
 {
-    internal class MessageRouter : IDetermineMessageOwnership
+    internal class MessageRouter : IRouteMessages
     {
-        public string GetEndpointFor(Type messageType)
+        public string DestinationFor(Type t)
         {
             return "ping";
         }

@@ -1,36 +1,34 @@
-﻿using System.Linq;
+﻿using System.Data;
+using System.Linq;
+using Constant.Module.Interfaces.Persistence.ReadModel;
 using Dapper;
-using NEventStore.Persistence.Sql;
-using Ping.Model.Read;
-using PingPong.Shared;
+using Ping.Shared.Model.Read;
+using Ping.Web.Services;
 
-namespace Ping.Persistence.Dapper
+namespace Ping.Web.Persistence.Dapper
 {
-    internal class Repository : IReadModelRepository<PingSummary>
+    internal class Repository : IReadFromRepository<PingSummary>
     {
         private readonly IConnectionFactory _factory;
 
         public Repository(IConnectionFactory factory)
         {
-
             _factory = factory;
-            
         }
 
         public void Create(PingSummary obj)
         {
-            using (var connection = _factory.Open())
+            using (IDbConnection connection = _factory.Open())
             {
                 connection.Execute(
                     "insert into pingsummaries (Id,TotalResponses,Active,Start,[End],PingsPerSecond) values (@Id,@TotalResponses,@Active,@Start,@End,@PingsPerSecond)",
-                    obj);    
+                    obj);
             }
-            
         }
 
         public PingSummary Retrieve(object id)
         {
-            using (var connection = _factory.Open())
+            using (IDbConnection connection = _factory.Open())
             {
                 return connection.Query<PingSummary>(
                     "select Id ,TotalResponses,Active,Start,[End],PingsPerSecond from pingsummaries where Id=@Id",
@@ -40,7 +38,7 @@ namespace Ping.Persistence.Dapper
 
         public IQueryable<PingSummary> Query()
         {
-            using (var connection = _factory.Open())
+            using (IDbConnection connection = _factory.Open())
             {
                 //Not Ling Support :(
                 return
@@ -51,23 +49,22 @@ namespace Ping.Persistence.Dapper
 
         public void Update(PingSummary obj)
         {
-            using (var connection = _factory.Open())
+            using (IDbConnection connection = _factory.Open())
             {
                 connection.Execute(
-              "update pingsummaries Set TotalResponses=@TotalResponses,Active=@Active,Start=@Start,[End]=@End,PingsPerSecond=@PingsPerSecond where Id=@Id",
-              obj);
+                    "update pingsummaries Set TotalResponses=@TotalResponses,Active=@Active,Start=@Start,[End]=@End,PingsPerSecond=@PingsPerSecond where Id=@Id",
+                    obj);
             }
-            
         }
 
         public void Delete(PingSummary obj)
         {
-            using (var connection = _factory.Open())
+            using (IDbConnection connection = _factory.Open())
             {
                 connection.Execute("delete pingsummaries where Id=@Id", obj);
             }
         }
-        
-        
     }
+
+    
 }

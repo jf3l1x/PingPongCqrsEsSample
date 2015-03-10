@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
+using Constant.Module.Interfaces;
 using LightInject;
-using Ping.Configuration;
 using PingPong.Shared;
+using Pong;
 using Pong.Configuration;
-
 
 namespace PingPong.Worker
 {
@@ -12,9 +11,10 @@ namespace PingPong.Worker
     {
         private static void Main(string[] args)
         {
-            var container = CreateInjectorContainer();
-            var engines = container.GetAllInstances<IModuleEngine>().ToList();
-            engines.ForEach(e => e.StartListener());
+            ServiceContainer container = CreateInjectorContainer();
+            container.GetInstance<IModuleEngine>().StartListener();
+            //container.GetInstance<IWorkerModule>().Start(null);
+
             Console.WriteLine("Press some key to end!");
             Console.Read();
         }
@@ -23,31 +23,34 @@ namespace PingPong.Worker
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
-            container.Register<IModuleEngine, Ping.Engine>("ping");
-            container.Register<IModuleEngine, Pong.Engine>("pong");
+            container.Register<IWorkerModule, Ping.Worker.Engine>("ping");
+            container.Register<IModuleEngine, Engine>("pong");
 
-            container.RegisterInstance(new PingOptions
-            {
-                RunMode = RunMode.Sync,
-                ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
-                WriteModelPersistenceMode = WritePersistenceMode.SqlServer
-            });
+            //container.RegisterInstance(new PingOptions
+            //{
+            //    RunMode = RunMode.Sync,
+            //    ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
+            //    WriteModelPersistenceMode = WritePersistenceMode.SqlServer
+            //});
 
             container.RegisterInstance(new PongOptions
             {
                 ReadModelPersistenceMode = ReadPersistenceMode.EntityFramework,
                 WriteModelPersistenceMode = WritePersistenceMode.SqlServer
             });
-            
+
             return container;
         }
 
         private static IModuleConfiguration Configure()
         {
             var tenantConfigurator = new TenantConfigurator("Server=.;Database=pingpong;Trusted_Connection=True;");
-            
-            
-            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes"){ReceiveMessages = true};
+
+
+            return new MemoryConfiguration(tenantConfigurator, "amqp://jf3l1x:password@localhost:5672/testes")
+            {
+                ReceiveMessages = true
+            };
         }
     }
 }

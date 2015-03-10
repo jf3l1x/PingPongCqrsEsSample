@@ -1,7 +1,8 @@
-﻿using LightInject;
+﻿using Constant.Module.Interfaces;
+using LightInject;
 using Owin;
-﻿using Ping.Configuration;
-﻿using PingPong.Shared;
+using Ping.Web.Configuration;
+using PingPong.Shared;
 using Pong.Configuration;
 
 namespace PingPong.WebHost
@@ -12,7 +13,7 @@ namespace PingPong.WebHost
         {
             var container = CreateInjectorContainer();
 
-            app.Map("/ping", map => container.GetInstance<IModuleEngine>("ping").RegisterApi(map));
+            app.Map("/ping", map => container.GetInstance<IWebModule>("ping").RegisterApi(map,new WebModuleContainer()));
             app.Map("/pong", map => container.GetInstance<IModuleEngine>("pong").RegisterApi(map));
         }
 
@@ -20,18 +21,13 @@ namespace PingPong.WebHost
         {
             var container = new ServiceContainer();
             container.RegisterInstance(Configure());
-            container.RegisterInstance(new PingOptions
-            {
-                RunMode = RunMode.Async,
-                ReadModelPersistenceMode = ReadPersistenceMode.NHibernate
-            });
-
+           
             container.RegisterInstance(new PongOptions
             {
                 
             });
 
-            container.Register<IModuleEngine, Ping.Engine>("ping");
+            container.Register<IWebModule, Ping.Web.Engine>("ping");
             container.Register<IModuleEngine, Pong.Engine>("pong");
             
 

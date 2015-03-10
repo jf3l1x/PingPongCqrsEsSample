@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping", "Ping\Ping.csproj", "{D22C4478-A733-421E-BF44-33238E22CC30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping.Web", "Ping\Ping.Web.csproj", "{D22C4478-A733-421E-BF44-33238E22CC30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Worker", "PingPong.Worker\PingPong.Worker.csproj", "{8199ECF0-9BDB-4146-8A60-CE85B2A065E8}"
 EndProject
@@ -14,6 +14,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Shared", "PingPong.Shared\PingPong.Shared.csproj", "{81FF700E-CD70-482F-A800-336E178C2A4F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting and Worker", "Hosting and Worker", "{429DD05A-0FA1-4669-B6D4-E711209BDCF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping.Shared", "Ping.Shared\Ping.Shared.csproj", "{F6FC76C7-6596-4611-9DE5-2726BA64052D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping.Worker", "Ping.Worker\Ping.Worker.csproj", "{B4B5C967-F53E-44BD-9B9E-DD11238979BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,14 @@ Global
 		{81FF700E-CD70-482F-A800-336E178C2A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81FF700E-CD70-482F-A800-336E178C2A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81FF700E-CD70-482F-A800-336E178C2A4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6FC76C7-6596-4611-9DE5-2726BA64052D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6FC76C7-6596-4611-9DE5-2726BA64052D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6FC76C7-6596-4611-9DE5-2726BA64052D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6FC76C7-6596-4611-9DE5-2726BA64052D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B5C967-F53E-44BD-9B9E-DD11238979BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B5C967-F53E-44BD-9B9E-DD11238979BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B5C967-F53E-44BD-9B9E-DD11238979BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B5C967-F53E-44BD-9B9E-DD11238979BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
