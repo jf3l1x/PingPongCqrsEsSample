@@ -31,7 +31,7 @@ namespace Ping.Worker.Handlers
 
         public void Handle(PingResponseReceived evt)
         {
-            PingSummary summary = _readModelRepository.Value.Retrieve(evt.AggregateId);
+            var summary = _readModelRepository.Value.Retrieve(evt.AggregateId);
             if (summary != null)
             {
                 summary.TotalResponses++;
@@ -78,7 +78,7 @@ namespace Ping.Worker.Handlers
 
         public void Handle(PingStopped evt)
         {
-            PingSummary summary = _readModelRepository.Value.Retrieve(evt.AggregateId);
+            var summary = _readModelRepository.Value.Retrieve(evt.AggregateId);
             if (summary != null)
             {
                 summary.Active = false;

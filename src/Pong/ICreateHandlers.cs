@@ -1,6 +1,4 @@
-﻿using PingPong.Shared;
-
-namespace Pong
+﻿namespace Pong
 {
     public interface ICreateHandlers
     {

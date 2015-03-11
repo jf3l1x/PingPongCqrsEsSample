@@ -4,6 +4,7 @@ using System.Linq;
 using CommonDomain;
 using CommonDomain.Persistence;
 using CommonDomain.Persistence.EventStore;
+using Constant.Module.Interfaces.Bus;
 using LightInject;
 using NEventStore;
 using NEventStore.Persistence.Sql;
@@ -27,7 +28,11 @@ using Pong.Persistence.NHibernate.Mappings;
 using Pong.Services.Default;
 using Rebus;
 using Rebus.Configuration;
+using Rebus.Logging;
 using Rebus.RabbitMQ;
+using Serilog;
+using IMutateMessages = Rebus.IMutateMessages;
+using IServiceBus = PingPong.Shared.IServiceBus;
 
 namespace Pong
 {
@@ -49,6 +54,9 @@ namespace Pong
 
         public void StartListener()
         {
+            Log.Logger = new LoggerConfiguration()
+              .WriteTo.ColoredConsole().MinimumLevel.Error()
+              .CreateLogger();
             var container=CreateContainer();
             container.GetInstance<IBus>().Subscribe<PongRequested>();
         }
@@ -69,18 +77,18 @@ namespace Pong
             container.Register<IDetectConflicts, NullConflictDetection>();
             container.Register<IDetermineMessageOwnership, MessageRouter>();
             container.Register<IContainerAdapter, MyContainerAdapter>();
-            container.Register<IResolveTypes, DefaultTypeResolver>();
+            container.Register<IResolveTypeName, DefaultTypeResolver>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
             container.Register<RebusHandler>();
 
             container.RegisterInstance(
-                Configure.With(container.GetInstance<IContainerAdapter>())
+                Configure.With(container.GetInstance<IContainerAdapter>()).Logging(l=>l.None())
                     .Transport(
                         t =>
                             t.UseRabbitMq(_configuration.BusConnectionString, "pong", "pongErrors")
                                 .ManageSubscriptions()
                                 .UseExchange("Rebus")
-                                .AddEventNameResolver(ResoulveTypeName))
+                                .AddEventNameResolver(ResolveTypeName))
                     .Events(r => r.MessageMutators.Add(container.GetInstance<IMutateMessages>()))
                     .MessageOwnership(d => d.Use(container.GetInstance<IDetermineMessageOwnership>()))
                     .CreateBus().Start());
@@ -97,13 +105,13 @@ namespace Pong
             return container;
         }
 
-        private string ResoulveTypeName(Type type)
+        private string ResolveTypeName(Type type)
         {
             if (type == typeof (PongRequested))
                 return "pongrequested";
             if (type == typeof (PongSent))
                 return "pongsent";
-            return string.Empty;
+            return type.AssemblyQualifiedName;
         }
 
         private void ConfigureReadPersistenceModel(ServiceContainer container)
@@ -169,15 +177,27 @@ namespace Pong
         }
     }
 
-    internal class DefaultTypeResolver : IResolveTypes
+    internal class DefaultTypeResolver : IResolveTypeName
     {
-        public Type ResolveType(string eventName)
+
+
+        public string Resolve(Type t)
         {
-            return
-                typeof (Engine).Assembly.GetTypes()
-                    .FirstOrDefault(
-                        t =>
-                            String.Compare(t.Name, eventName, StringComparison.InvariantCultureIgnoreCase) == 0);
+            if (t == typeof(PongRequested))
+                return "pongrequested";
+            if (t == typeof(PongSent))
+                return "pongsent";
+            return t.AssemblyQualifiedName;
+        }
+
+        public Type Resolve(string name)
+        {
+            if (name == "pongrequested")
+                return typeof(PongRequested);
+            if (name == "pongsent")
+                return typeof(PongSent);
+            return Type.GetType(name);
         }
     }
+
 }

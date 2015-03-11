@@ -4,15 +4,10 @@ using System.Web.OData.Extensions;
 using Constant.Module.Interfaces;
 using Constant.Module.Interfaces.Bus;
 using Constant.Module.Interfaces.Configuration;
-using Constant.Module.Interfaces.Persistence.ReadModel;
 using LightInject;
 using Owin;
-using Ping.Shared;
 using Ping.Shared.Model.Read;
 using Ping.Shared.Services;
-using Ping.Web.Persistence.Dapper;
-using Ping.Web.Services;
-using Ping.Web.Services.Default;
 
 namespace Ping.Web
 {
@@ -51,14 +46,14 @@ namespace Ping.Web
 
             container.Register<IRouteMessages, MessageRouter>();
             container.Register<IMutateMessages, DefaultMessageMutator>();
-            container.Register<IResolveTypeName,TypeNameResolver>();
-            container.Register<IConnectionFactory,SqlConnectionFactory>();
-            container.RegisterInstance( factory.CreateBus(null,
-                   new[] {container.GetInstance<IMutateMessages>()}, container.GetInstance<IRouteMessages>(),
-                   new[] { new TypeNameResolver() }));
+            container.Register<IResolveTypeName, TypeNameResolver>();
+
+            container.RegisterInstance(factory.CreateBus(null,
+                new[] {container.GetInstance<IMutateMessages>()}, container.GetInstance<IRouteMessages>(),
+                new[] {new TypeNameResolver()}));
 
 
-            container.Register<IReadFromRepository<PingSummary>, Repository>();
+            container.Register(ctx => factory.CreateRepository<PingSummary>());
 
             return container;
         }

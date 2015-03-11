@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Ping.Shared.Model.Read
 {
-    [Serializable]
     public class PingSummary
     {
         [Key]

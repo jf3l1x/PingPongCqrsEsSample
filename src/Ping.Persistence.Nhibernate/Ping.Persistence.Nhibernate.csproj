@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8199ECF0-9BDB-4146-8A60-CE85B2A065E8}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{967D4B4C-275B-4505-905C-C069D66776A7}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PingPong.Worker</RootNamespace>
-    <AssemblyName>PingPong.Worker</AssemblyName>
+    <RootNamespace>Ping.Persistence.Nhibernate</RootNamespace>
+    <AssemblyName>Ping.Persistence.Nhibernate</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,19 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Constant.Hosting.Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Hosting.Rebus.dll</HintPath>
-    </Reference>
-    <Reference Include="Constant.Module.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Constant.Module.Interfaces">
       <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Module.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="LightInject">
-      <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\packages\NHibernate.4.0.3.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -53,27 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Mappings\PingSummaryMap.cs" />
+    <Compile Include="NHibernateRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WorkerModuleContainer.cs" />
+    <Compile Include="ConfigurationExtension.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\Ping.Shared\Ping.Shared.csproj">
+      <Project>{f6fc76c7-6596-4611-9de5-2726ba64052d}</Project>
+      <Name>Ping.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Ping.Worker\Ping.Worker.csproj">
-      <Project>{b4b5c967-f53e-44bd-9b9e-dd11238979bc}</Project>
-      <Name>Ping.Worker</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PingPong.Shared\PingPong.Shared.csproj">
-      <Project>{81ff700e-cd70-482f-a800-336e178c2a4f}</Project>
-      <Name>PingPong.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Pong\Pong.csproj">
-      <Project>{bf43bfb2-843d-488d-8641-42e50c57a9c0}</Project>
-      <Name>Pong</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,12 +4,20 @@ using Constant.Hosting.Rebus;
 using Constant.Module.Interfaces.Bus;
 using Constant.Module.Interfaces.Configuration;
 using Constant.Module.Interfaces.Persistence.ReadModel;
+using LightInject;
 using Rebus.RabbitMQ;
 
 namespace PingPong.WebHost
 {
     public class WebModuleContainer : IWebModuleContainer
     {
+        private readonly ServiceContainer _container;
+
+        public WebModuleContainer(ServiceContainer container)
+        {
+            _container = container;
+        }
+
         public ISendMessages CreateBus(IActivateHandlers activator, IEnumerable<IMutateMessages> mutators,
             IRouteMessages router, IEnumerable<IResolveTypeName> resolvers)
         {
@@ -17,6 +25,7 @@ namespace PingPong.WebHost
             bus.RegisterActivatorFactory(() => activator);
             bus.RegisterMutators(mutators);
             bus.SetMessageRouter(router);
+
             bus.GetConfigurator().Transport(transport =>
             {
                 var options = transport.UseRabbitMqInOneWayMode("amqp://jf3l1x:password@localhost:5672/testes")
@@ -36,7 +45,7 @@ namespace PingPong.WebHost
 
         public IReadFromRepository<T> CreateRepository<T>()
         {
-            throw new NotImplementedException();
+            return _container.GetInstance<IReadFromRepository<T>>();
         }
 
         public IGiveTenantConfiguration CreateTenantConfiguration()

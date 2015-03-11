@@ -1,5 +1,6 @@
 ﻿using Constant.Module.Interfaces.Bus;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Ping.Shared.Services
 {
@@ -14,21 +15,22 @@ namespace Ping.Shared.Services
 
         public object MutateIncoming(object message)
         {
-            var busMessage = message as BusMessage;
+            var busMessage = message as string;
             if (busMessage != null)
             {
-                return JsonConvert.DeserializeObject(busMessage.Content, _resolver.Resolve(busMessage.EventName));
+                var json=JObject.Parse(busMessage);
+                return json.ToObject(_resolver.Resolve(json.Value<string>("eventName")));
             }
             return null;
         }
 
         public object MutateOutgoing(object message)
         {
-            return new BusMessage
-            {
-                Content = JsonConvert.SerializeObject(message),
-                EventName = message.GetType().AssemblyQualifiedName
-            };
+
+            var json = JObject.FromObject(message);
+            json.Add("eventName",_resolver.Resolve(message.GetType()));
+            return json.ToString();
+            ;
         }
     }
 }

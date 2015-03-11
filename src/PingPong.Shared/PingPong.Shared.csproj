@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Constant.Module.Interfaces">
-      <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
+    <Reference Include="Constant.Module.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Module.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -66,7 +67,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusMessage.cs" />
     <Compile Include="DefaultMessageMutator.cs" />
     <Compile Include="EntityFramework\Config.cs" />
     <Compile Include="EventStoreRepositoryWithSnapshot.cs" />

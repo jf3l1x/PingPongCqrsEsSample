@@ -30,14 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Constant.Hosting.Rebus">
-      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Debug\Constant.Hosting.Rebus.dll</HintPath>
+    <Reference Include="Constant.Hosting.Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Hosting.Rebus.dll</HintPath>
     </Reference>
-    <Reference Include="Constant.Module.Interfaces">
-      <HintPath>..\..\..\constant.module.interfaces\src\Constant.Module.Interfaces\bin\Debug\Constant.Module.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Dapper">
-      <HintPath>..\packages\Dapper.1.38\lib\net45\Dapper.dll</HintPath>
+    <Reference Include="Constant.Module.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Module.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
@@ -45,11 +44,17 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    </Reference>
     <Reference Include="LightInject">
       <HintPath>..\packages\LightInject.3.0.2.5\lib\net45\LightInject.dll</HintPath>
     </Reference>
     <Reference Include="NEventStore">
       <HintPath>..\packages\NEventStore.5.1.1\lib\net40\NEventStore.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\packages\NHibernate.4.0.3.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="RabbitMQ.Client">
       <HintPath>..\packages\RabbitMQ.Client.3.4.0\lib\net35\RabbitMQ.Client.dll</HintPath>
@@ -59,6 +64,12 @@
     </Reference>
     <Reference Include="Rebus.RabbitMQ">
       <HintPath>..\packages\Rebus.RabbitMQ.0.80.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog">
+      <HintPath>..\packages\Serilog.1.4.204\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx">
+      <HintPath>..\packages\Serilog.1.4.204\lib\net45\Serilog.FullNetFx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -73,9 +84,9 @@
   <ItemGroup>
     <Compile Include="Engine.cs" />
     <Compile Include="Handlers\DefaultHandler.cs" />
-    <Compile Include="Persistence\Dapper\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AggregateFactory.cs" />
+    <Compile Include="Services\ContainerAdapter.cs" />
     <Compile Include="Services\HandlerActivator.cs" />
     <Compile Include="Services\InvokeHandler.cs" />
     <Compile Include="Services\NullConflictDetection.cs" />
@@ -87,6 +98,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\Ping.Persistence.Nhibernate\Ping.Persistence.Nhibernate.csproj">
+      <Project>{967d4b4c-275b-4505-905c-c069d66776a7}</Project>
+      <Name>Ping.Persistence.Nhibernate</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ping.Shared\Ping.Shared.csproj">
       <Project>{F6FC76C7-6596-4611-9DE5-2726BA64052D}</Project>
       <Name>Ping.Shared</Name>

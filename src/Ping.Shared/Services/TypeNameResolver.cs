@@ -12,7 +12,7 @@ namespace Ping.Shared.Services
                 return "pongrequested";
             if (t == typeof (PongSent))
                 return "pongsent";
-            return t.FullName;
+            return t.AssemblyQualifiedName;
         }
 
         public Type Resolve(string name)
