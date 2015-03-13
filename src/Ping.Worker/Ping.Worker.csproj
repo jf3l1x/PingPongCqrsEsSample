@@ -30,13 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Constant.Hosting.Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Constant.Hosting.Rebus, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Hosting.Rebus.dll</HintPath>
+      <HintPath>..\packages\Constant.Hosting.Rebus.1.0.2\lib\net45\Constant.Hosting.Rebus.dll</HintPath>
     </Reference>
-    <Reference Include="Constant.Module.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Constant.Module.Interfaces, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\constant.hosting.rebus\src\Constant.Hosting.Rebus\bin\Release\Constant.Module.Interfaces.dll</HintPath>
+      <HintPath>..\packages\Constant.Module.Interfaces.1.0.12\lib\net45\Constant.Module.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
@@ -59,8 +59,9 @@
     <Reference Include="RabbitMQ.Client">
       <HintPath>..\packages\RabbitMQ.Client.3.4.0\lib\net35\RabbitMQ.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Rebus">
-      <HintPath>..\packages\Rebus.0.80.0\lib\NET45\Rebus.dll</HintPath>
+    <Reference Include="Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rebus.0.80.1\lib\NET45\Rebus.dll</HintPath>
     </Reference>
     <Reference Include="Rebus.RabbitMQ">
       <HintPath>..\packages\Rebus.RabbitMQ.0.80.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>

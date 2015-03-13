@@ -36,7 +36,7 @@ namespace Ping.Worker.Handlers
             {
                 summary.TotalResponses++;
                 summary.PingsPerSecond = summary.TotalResponses/
-                                         DateTimeOffset.UtcNow.Subtract(summary.Start).TotalSeconds;
+                                         evt.ReceiveTime.Subtract(summary.Start).TotalSeconds;
                 _readModelRepository.Value.Update(summary);
             }
         }

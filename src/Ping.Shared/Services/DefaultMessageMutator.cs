@@ -21,7 +21,7 @@ namespace Ping.Shared.Services
                 var json=JObject.Parse(busMessage);
                 return json.ToObject(_resolver.Resolve(json.Value<string>("eventName")));
             }
-            return null;
+            return message;
         }
 
         public object MutateOutgoing(object message)

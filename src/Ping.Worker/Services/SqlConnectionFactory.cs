@@ -8,16 +8,18 @@ namespace Ping.Worker.Services
 {
     public class SqlConnectionFactory : IConnectionFactory
     {
-        private readonly IGiveTenantConfiguration _configurator;
+        private readonly Func<IGiveTenantConfiguration> _configuratorFactory;
+        
 
-        public SqlConnectionFactory(IGiveTenantConfiguration configurator)
+        public SqlConnectionFactory(Func<IGiveTenantConfiguration> configuratorFactory)
         {
-            _configurator = configurator;
+            _configuratorFactory = configuratorFactory;
+            
         }
 
         public IDbConnection Open()
         {
-            var connection = new SqlConnection(_configurator.GetReadModelConnectionString());
+            var connection = new SqlConnection(_configuratorFactory().GetReadModelConnectionString());
             connection.Open();
             return connection;
         }

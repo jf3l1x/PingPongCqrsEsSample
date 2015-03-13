@@ -7,7 +7,6 @@ using Constant.Hosting.Rebus;
 using Constant.Module.Interfaces;
 using Constant.Module.Interfaces.Bus;
 using Constant.Module.Interfaces.Configuration;
-using Constant.Module.Interfaces.Persistence.ReadModel;
 using LightInject;
 using NEventStore;
 using NEventStore.Persistence.Sql;
@@ -18,7 +17,6 @@ using NHibernate.Dialect;
 using NHibernate.Driver;
 using Ping.Persistence.Nhibernate;
 using Ping.Shared.Messages.ExternalEvents;
-using Ping.Shared.Model.Read;
 using Ping.Shared.Services;
 using Ping.Worker.Handlers;
 using Ping.Worker.Services;
@@ -52,7 +50,7 @@ namespace Ping.Worker
 
             container.Register<DefaultHandler>();
 
-            container.RegisterInstance(factory.CreateTenantConfiguration());
+            container.Register(ctx=>factory.CreateTenantConfiguration());
             container.Register<IRepository, EventStoreRepository>();
             container.Register<IConstructAggregates, AggregateFactory>();
             container.Register<IDetectConflicts, NullConflictDetection>();
@@ -75,7 +73,6 @@ namespace Ping.Worker
                 .UsingSqlPersistence(container.GetInstance<IConnectionFactory>())
                 .WithDialect(new MsSqlDialect())
                 .UsingJsonSerialization()
-                .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>())
                 .Build());
 
             return container;
@@ -88,7 +85,6 @@ namespace Ping.Worker
                 ctx =>
                     ctx.GetInstance<ISessionFactory>()
                         .OpenStatelessSession());
-            
         }
 
         private void RegisterRebus(ServiceContainer container)
@@ -97,6 +93,7 @@ namespace Ping.Worker
             bus.RegisterActivatorFactory(container.GetInstance<IActivateHandlers>);
             bus.RegisterMutators(container.GetAllInstances<IMutateMessages>());
             bus.SetMessageRouter(container.GetInstance<IRouteMessages>());
+            
             bus.GetConfigurator().Transport(transport =>
             {
                 RabbitMqOptions options = transport.UseRabbitMq(

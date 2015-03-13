@@ -101,7 +101,7 @@ namespace Pong
             container.RegisterInstance(Wireup.Init()
                 .ConfigurePersistence(_options, container)
                 .UsingJsonSerialization()
-                .HookIntoPipelineUsing(container.GetAllInstances<IPipelineHook>()).Build());
+                .Build());
             return container;
         }
 

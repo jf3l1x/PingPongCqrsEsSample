@@ -24,7 +24,7 @@ namespace PingPong.Shared
                 var json = JObject.Parse(busMessage);
                 return json.ToObject(_resolver.Resolve(json.Value<string>("eventName")));
             }
-            return null;
+            return message;
         }
 
         public object MutateOutgoing(object message)
@@ -33,7 +33,7 @@ namespace PingPong.Shared
             var json = JObject.FromObject(message);
             json.Add("eventName", _resolver.Resolve(message.GetType()));
             return json.ToString();
-            ;
+            
         }
 
     }
